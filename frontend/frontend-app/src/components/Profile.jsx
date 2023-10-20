@@ -2,25 +2,56 @@ import React, { useState, useEffect } from 'react';
 import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
+import { Link } from 'react-router-dom'; 
 
 function Profile() {
   const [profileData, setProfileData] = useState(null);
 
   useEffect(() => {
-    // Retrieve the jwtResponse from localStorage
-    const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
+    // Hardcoded profile data
+    const profile = {
+      username: 'Hirai Momo',
+      email: 'Momo@eTwice.com',
+      creditScore: 200,
+      profilePictureUrl:
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvQOzLVWtuIaOlLcxtYyFdnQVDUHcGKTaCRQ&usqp=CAU',
+    };
+
+    setProfileData(profile);
+  }, []);
+
+    // // Retrieve the jwtResponse from localStorage
+    // useEffect(() => {
+    //   const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
+
+    //   // console.log(jwtResponse.accessToken)
+
+    //   const userId = jwtResponse.id;
+    //   axios.get(`http://localhost:8080/api/user/details/${userId}`,
+    //       { headers:
+    //             {
+    //               Authorization : jwtResponse.accessToken,
+    //               withCredentials:true
+    //             }
+    //       }) .then(res => {
+    //         const profile = {
+    //           username: res.data.username,
+    //           email: res.data.email,
+    //           creditScore: res.data.creditScore,
+    //           profilePictureUrl:
+    //             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvQOzLVWtuIaOlLcxtYyFdnQVDUHcGKTaCRQ&usqp=CAU', // Hardcoded URL for profile picture
+    //         };
+    //         setProfileData(profile);
+    //       })
+    //       .catch((error) => {
+    //         console.error('Error fetching profile data:', error);
+    //       });
+      
+    //   }, []);
 
     // Check if jwtResponse is available
-    if (jwtResponse) {
-      // Use the data from jwtResponse to populate the profileData
-      setProfileData({
-        username: jwtResponse.username,
-        email: jwtResponse.email || 'Admin@admin.com',
-        creditScore: jwtResponse.creditScore || 100, // Hardcoded value for creditScore
-        profilePictureUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvQOzLVWtuIaOlLcxtYyFdnQVDUHcGKTaCRQ&usqp=CAU', // Hardcoded URL for profile picture
-      });
-    }
-  }, []);
+
+
 
   return (
     <div>
@@ -45,6 +76,10 @@ function Profile() {
           <p>
             <strong>CreditScore:</strong> {profileData?.creditScore}
           </p>
+            {/* Add the "Change My Password" button that links to the ChangePassword component */}
+            <Link to="/change-password">
+            <button>Change My Password</button>
+          </Link>
         </div>
       </div>
     </div>
@@ -52,3 +87,4 @@ function Profile() {
 }
 
 export default Profile;
+
