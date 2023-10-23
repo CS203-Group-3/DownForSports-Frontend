@@ -1,106 +1,130 @@
-import MyNavbar from './NavbarComp';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState } from 'react';
 import axios from 'axios';
+import MyNavbar from './NavbarComp';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function ChangePassword() {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
-  //no posting
-//   const handleChangePassword = () => {
-//     // Implement the logic to change the password here
-//     if (newPassword === confirmNewPassword) {
-//       // Passwords match, proceed with the change
-//       // You can make an API call to your server to update the password
-//       console.log('Password changed successfully.');
-//     } else {
-//       // Passwords do not match, show an error
-//       console.error('New passwords do not match.');
-//     }
-//   };
+  const handleChangePassword = () => {
+    setError(null);
+    setSuccessMessage(null);
 
-    //send in http request to backend
-    const handleChangePassword = () => {
-        if (newPassword === confirmNewPassword) {
-          // Passwords match, proceed with the change
-          const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
-          const userId = jwtResponse.id;
-    
-          // Create a ChangePasswordRequest object to send to the server
-          const changePasswordRequest = {
-            currentPassword: oldPassword,
-            newPassword: newPassword,
-            confirmPassword: confirmNewPassword,
-          };
-    
-          axios.post(`http://localhost:8080/api/user/${userId}`, changePasswordRequest, {
-            headers: {
-              Authorization: jwtResponse.accessToken,
-              withCredentials: true,
-            },
-          })
-          .then(response => {
-            console.log('Password changed successfully.');
-            // Handle success, e.g., show a success message to the user.
-          })
-          .catch(error => {
-            console.error('Error changing password:', error);
-            // Handle errors, e.g., show an error message to the user.
-          });
-        } else {
-          console.error('New passwords do not match.');
-          // Handle the case where new passwords do not match.
-        }
+    if (newPassword === confirmNewPassword) {
+      const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
+      const userId = jwtResponse.id;
+
+      const changePasswordRequest = {
+        currentPassword: oldPassword,
+        newPassword: newPassword,
       };
-  
 
-  // Inline CSS styles
-  const containerStyle = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: 'calc(100vh - 60px)',
+      axios
+        .post(`http://localhost:8080/api/user/${userId}`, changePasswordRequest, {
+          headers: {
+            Authorization: jwtResponse.accessToken,
+            withCredentials: true,
+          },
+        })
+        .then((response) => {
+          console.log('Password changed successfully.');
+          setSuccessMessage('Password changed successfully');
+        })
+        .catch((error) => {
+          console.error('Error changing password:', error);
+          if (error.response && error.response.data) {
+            setError(error.response.data);
+          }
+        });
+    } else {
+      setError('New passwords do not match.');
+    }
   };
 
-  const boxStyle = {
-    border: '1px solid #ccc',
-    padding: '20px',
-    borderRadius: '5px',
-    maxWidth: '400px',
-    width: '100%',
-    boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
-    backgroundColor: '#f9f9f9',
-  };
-
-return (
+  return (
     <div>
-      <MyNavbar /> {/* Include the MyNavbar component at the top */}
+      <MyNavbar />
       <div style={containerStyle}>
         <div style={boxStyle}>
           <h1>Change Password</h1>
           <form>
             <div>
               <label htmlFor="oldPassword">Old Password:</label>
-              <input type="password" id="oldPassword" name="oldPassword" style={{ width: '100%' }} />
+              <input
+                type="password"
+                id="oldPassword"
+                name="oldPassword"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                style={{ width: '100%' }}
+              />
             </div>
             <div>
               <label htmlFor="newPassword">New Password:</label>
-              <input type="password" id="newPassword" name="newPassword" style={{ width: '100%' }} />
+              <input
+                type="password"
+                id="newPassword"
+                name="newPassword"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                style={{ width: '100%' }}
+              />
             </div>
             <div>
               <label htmlFor="confirmNewPassword">Confirm New Password:</label>
-              <input type="password" id="confirmNewPassword" name="confirmNewPassword" style={{ width: '100%' }} />
+              <input
+                type="password"
+                id="confirmNewPassword"
+                name="confirmNewPassword"
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                style={{ width: '100%' }}
+              />
             </div>
-            <button style={{ marginTop: '10px', width: '100%' }} className="btn btn-primary" type="submit">
+            <button
+              style={{ marginTop: '10px', width: '100%' }}
+              className="btn btn-primary"
+              type="button"
+              onClick={handleChangePassword}
+            >
               Change Password
             </button>
+            {error && (
+              <div className="alert alert-danger mt-3" role="alert">
+                {error}
+              </div>
+            )}
+            {successMessage && (
+              <div className="alert alert-success mt-3" role="alert">
+                {successMessage}
+              </div>
+            )}
           </form>
         </div>
       </div>
     </div>
   );
 }
+
+const containerStyle = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  minHeight: 'calc(100vh - 60px)',
+};
+
+const boxStyle = {
+  border: '1px solid #ccc',
+  padding: '20px',
+  borderRadius: '5px',
+  maxWidth: '400px',
+  width: '100%',
+  boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+  backgroundColor: '#f9f9f9',
+};
 
 export default ChangePassword;

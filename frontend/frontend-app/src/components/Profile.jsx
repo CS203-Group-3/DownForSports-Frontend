@@ -7,47 +7,47 @@ import { Link } from 'react-router-dom';
 function Profile() {
   const [profileData, setProfileData] = useState(null);
 
-  useEffect(() => {
-    // Hardcoded profile data
-    const profile = {
-      username: 'Hirai Momo',
-      email: 'Momo@Twice.com',
-      creditScore: 269,
-      profilePictureUrl:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvQOzLVWtuIaOlLcxtYyFdnQVDUHcGKTaCRQ&usqp=CAU',
-    };
+  // useEffect(() => {
+  //   // Hardcoded profile data
+  //   const profile = {
+  //     username: 'Hirai Momo',
+  //     email: 'Momo@Twice.com',
+  //     creditScore: 269,
+  //     profilePictureUrl:
+  //       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvQOzLVWtuIaOlLcxtYyFdnQVDUHcGKTaCRQ&usqp=CAU',
+  //   };
 
-    setProfileData(profile);
-  }, []);
+  //   setProfileData(profile);
+  // }, []);
 
-    // // Retrieve the jwtResponse from localStorage
-    // useEffect(() => {
-    //   const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
+    // Retrieve the jwtResponse from localStorage
+    useEffect(() => {
+      const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
 
-    //   // console.log(jwtResponse.accessToken)
+      // console.log(jwtResponse.accessToken)
 
-    //   const userId = jwtResponse.id;
-    //   axios.get(`http://localhost:8080/api/user/details/${userId}`,
-    //       { headers:
-    //             {
-    //               Authorization : jwtResponse.accessToken,
-    //               withCredentials:true
-    //             }
-    //       }) .then(res => {
-    //         const profile = {
-    //           username: res.data.username,
-    //           email: res.data.email,
-    //           creditScore: res.data.creditScore,
-    //           profilePictureUrl:
-    //             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvQOzLVWtuIaOlLcxtYyFdnQVDUHcGKTaCRQ&usqp=CAU', // Hardcoded URL for profile picture
-    //         };
-    //         setProfileData(profile);
-    //       })
-    //       .catch((error) => {
-    //         console.error('Error fetching profile data:', error);
-    //       });
+      const userId = jwtResponse.id;
+      axios.get(`http://localhost:8080/api/user/details/${userId}`,
+          { headers:
+                {
+                  Authorization : jwtResponse.accessToken,
+                  withCredentials:true
+                }
+          }) .then(res => {
+            const profile = {
+              username: res.data.username,
+              email: res.data.email,
+              creditScore: res.data.creditScore,
+              profilePictureUrl:
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvQOzLVWtuIaOlLcxtYyFdnQVDUHcGKTaCRQ&usqp=CAU', // Hardcoded URL for profile picture
+            };
+            setProfileData(profile);
+          })
+          .catch((error) => {
+            console.error('Error fetching profile data:', error);
+          });
       
-    //   }, []);
+      }, []);
 
     // Check if jwtResponse is available
 
