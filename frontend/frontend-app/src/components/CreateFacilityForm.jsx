@@ -5,6 +5,10 @@ import axios from "axios";
 function CreateFacilityForm() {
   const [facilityType, setFacilityType] = useState("");
   const [description, setDescription] = useState("");
+  const [openTime, setOpenTime] = useState("");
+  const [closingTime, setClosingTime] = useState("");
+  const [creditCost, setCreditCost] = useState("");
+  const [locationString, setLocationString] = useState("");
   const navigate = useNavigate();
 
   async function createFacility(event) {
@@ -25,6 +29,10 @@ function CreateFacilityForm() {
       await axios.post("http://localhost:8080/api/facilities", {
         facilityType: facilityType,
         description: description,
+        openTime: openTime,
+        closingTime: closingTime,
+        creditCost: creditCost,
+        locationString: locationString,
       }, { headers });
 
       alert("Facility created successfully");
@@ -61,6 +69,46 @@ function CreateFacilityForm() {
             required
           ></textarea>
         </div>
+        <div className="form-group">
+          <label>Open Time</label>
+          <input
+            type="text"
+            className="form-control"
+            value={openTime}
+            onChange={(e) => setOpenTime(e.target.value)}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Closing Time</label>
+          <input
+            type="text"
+            className="form-control"
+            value={closingTime}
+            onChange={(e) => setClosingTime(e.target.value)}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Credit Cost</label>
+          <input
+            type="text"
+            className="form-control"
+            value={creditCost}
+            onChange={(e) => setCreditCost(e.target.value)}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Location</label>
+          <input
+            type="text"
+            className="form-control"
+            value={locationString}
+            onChange={(e) => setLocationString(e.target.value)}
+            required
+          />
+        </div>
         <button type="submit" className="btn btn-primary">
           Create Facility
         </button>
@@ -70,5 +118,3 @@ function CreateFacilityForm() {
 }
 
 export default CreateFacilityForm;
-
-
