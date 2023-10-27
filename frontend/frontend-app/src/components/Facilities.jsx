@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Modal, Button, ListGroup } from 'react-bootstrap';
+import { Modal, Button, ListGroup, Alert } from 'react-bootstrap';
 import { useNavigate } from "react-router-dom";
 
 function FacilityList() {
@@ -16,6 +16,9 @@ function FacilityList() {
   const [timeslots, setTimeslots] = useState([]);
   const [selectedTimeslotIds, setSelectedTimeslotIds] = useState([]); // Define selectedTimeslotIds
   const navigate = useNavigate();
+  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false); // Add booking success state
+  const [bookingFailure, setBookingFailure] = useState(false); // Add booking fai
 
   useEffect(() => {
     axios.get("http://localhost:8080/api/facilities")
@@ -26,7 +29,6 @@ function FacilityList() {
         console.error("Error fetching facilities:", error);
       });
   }, []);
-
   const fetchDates = (facility) => {
     axios
       .get(`http://localhost:8080/api/facilities/${facility.facilityId}/dates`)
@@ -104,20 +106,20 @@ function FacilityList() {
     return currentIndex === lastIndex + 1;
   };
 
-  // async function booking() {
-  //   // Pass selectedFacility, selectedDateId, and selectedTimeslotIds to the booking page
-  //   navigate("/upcomingBookings", {
-  //     state: {
-  //       facility: selectedFacility,
-  //       facilityDateId: selectedDateId,
-  //       selectedTimeslotIds,
-  //     },
-  //   });
-  // }
-
   const booking = async () => {
     if (selectedFacility && selectedDateId && selectedTimeslotIds.length > 0) {
-      // 1. Create a function to format the TimeSlots array
+      // Open the confirmation dialog
+      setShowConfirmationDialog(true);
+      setBookingSuccess(false);
+      setBookingFailure(false);
+    } else {
+      console.error("Please select a facility, date, and at least one timeslot.");
+    }
+  };
+
+  const handleConfirmBooking = async () => {
+    if (selectedFacility && selectedDateId && selectedTimeslotIds.length > 0) {
+      // Create a function to format the TimeSlots array
       const formatTimeSlots = (timeslotIds, timeslotData) => {
         return timeslotIds.map((timeslotId) => {
           const timeslot = timeslotData.find((ts) => ts.timeslotId === timeslotId);
@@ -127,38 +129,46 @@ function FacilityList() {
           };
         });
       };
-  
-      // 2. Format the TimeSlots array
+
+      // Format the TimeSlots array
       const timeSlotsData = formatTimeSlots(selectedTimeslotIds, selectedTimeslots);
-  
-      // 3. Create the booking request
+
+      // Create the booking request
       const bookingRequest = {
         userId: JSON.parse(localStorage.getItem('jwtResponse')).id,
         facilityId: selectedFacility.facilityId,
-        timeBookingMade: new Date().toISOString(), // Format the date as needed
+        timeBookingMade: new Date().toISOString(),
         facilityDate: selectedDate,
-        timeSlots: timeSlotsData, // Use the formatted array
+        timeSlots: timeSlotsData,
       };
-  
+
       console.log("Booking Request:", bookingRequest);
-  
-      // Send the booking request to the backend
+
       try {
         const response = await axios.post("http://localhost:8080/api/bookings/makebooking", bookingRequest);
         console.log("Booking created:", response.data);
         // Handle successful booking creation
+
+        // Show success message
+        setBookingSuccess(true);
+        setBookingFailure(false);
+        setShowConfirmationDialog(false);
+
+        // Optional: Navigate to another page
+        //navigate("/upcomingBookings");
       } catch (error) {
         console.error("Error creating booking:", error);
         // Handle booking creation error
+
+        // Show failure message
+        setBookingSuccess(false);
+        setBookingFailure(true);
+        setShowConfirmationDialog(false);
       }
     } else {
       console.error("Please select a facility, date, and at least one timeslot.");
     }
   };
-  
-  
-  
-
 
   const openModal = (facility) => {
     console.log("Clicked Facility:", facility);
@@ -182,6 +192,17 @@ function FacilityList() {
     <div>
       <MyNavbar />
       <h1>Facility List</h1>
+        {bookingSuccess && (
+        <Alert variant="success">
+          Booking made successfully!
+        </Alert>
+      )}
+      {/* Display failure message */}
+      {bookingFailure && (
+        <Alert variant="danger">
+          Booking failed. Please try again.
+        </Alert>
+      )}
       <ul>
         {facilities.map((facility) => (
           <li key={facility.facilityId}>
@@ -203,7 +224,7 @@ function FacilityList() {
         </Modal.Header>
         <Modal.Body style={{ maxHeight: "400px", overflowY: "scroll" }}>
           {selectedDate ? (
-              <>
+            <>
               <h5>Timeslots Available:</h5>
               <ListGroup>
                 {timeslots.map((timeslot) => (
@@ -263,6 +284,27 @@ function FacilityList() {
               Book
             </Button>
           ) : null}
+        </Modal.Footer>
+      </Modal>
+
+      {/* Confirmation Dialog */}
+      <Modal show={showConfirmationDialog} onHide={() => setShowConfirmationDialog(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Booking</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Facility: {selectedFacility?.facilityType}</p>
+          <p>Date: {selectedDate}</p>
+          <p>Timeslot Start Time: {selectedTimeslots[0]?.time}</p>
+          <p>Timeslot End Time: {selectedTimeslots[selectedTimeslots.length - 1]?.time}</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowConfirmationDialog(false)}>
+            Go Back
+          </Button>
+          <Button variant="primary" onClick={handleConfirmBooking}>
+            Confirm Booking
+          </Button>
         </Modal.Footer>
       </Modal>
     </div>
