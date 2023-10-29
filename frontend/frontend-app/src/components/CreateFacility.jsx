@@ -3,7 +3,7 @@ import MyNavbar from './NavbarComp';
 import CreateFacilityForm from './CreateFacilityForm';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function App() {
+function createFacility() {
   return (
     <div>
       <MyNavbar />
@@ -12,5 +12,5 @@ function App() {
   );
 }
 
-export default App;
+export default createFacility;
 

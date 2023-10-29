@@ -18,7 +18,8 @@ function FacilityList() {
   const navigate = useNavigate();
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false); // Add booking success state
-  const [bookingFailure, setBookingFailure] = useState(false); // Add booking fai
+  const [bookingFailure, setBookingFailure] = useState(false); // Add booking fail
+  const [selectedEndTime, setSelectedEndTime] = useState(null);
 
   useEffect(() => {
     axios.get("http://localhost:8080/api/facilities")
@@ -29,6 +30,7 @@ function FacilityList() {
         console.error("Error fetching facilities:", error);
       });
   }, []);
+
   const fetchDates = (facility) => {
     axios
       .get(`http://localhost:8080/api/facilities/${facility.facilityId}/dates`)
@@ -106,8 +108,16 @@ function FacilityList() {
     return currentIndex === lastIndex + 1;
   };
 
-  const booking = async () => {
+  const booking = () => {
     if (selectedFacility && selectedDateId && selectedTimeslotIds.length > 0) {
+      // Calculate the end time by adding an hour to the last selected time slot
+      const lastSelectedTimeslot = selectedTimeslots[selectedTimeslots.length - 1];
+      const endDateTime = new Date(selectedDate + " " + lastSelectedTimeslot.time);
+      endDateTime.setHours(endDateTime.getHours() + 1);
+  
+      // Display the end time in the modal
+      setSelectedEndTime(endDateTime);
+  
       // Open the confirmation dialog
       setShowConfirmationDialog(true);
       setBookingSuccess(false);
@@ -116,6 +126,7 @@ function FacilityList() {
       console.error("Please select a facility, date, and at least one timeslot.");
     }
   };
+  
 
   const handleConfirmBooking = async () => {
     if (selectedFacility && selectedDateId && selectedTimeslotIds.length > 0) {
@@ -137,7 +148,7 @@ function FacilityList() {
       const bookingRequest = {
         userId: JSON.parse(localStorage.getItem('jwtResponse')).id,
         facilityId: selectedFacility.facilityId,
-        timeBookingMade: new Date().toISOString(),
+        //timeBookingMade: new Date().toISOString(),
         facilityDate: selectedDate,
         timeSlots: timeSlotsData,
       };
@@ -155,7 +166,7 @@ function FacilityList() {
         setShowConfirmationDialog(false);
 
         // Optional: Navigate to another page
-        //navigate("/upcomingBookings");
+        navigate("/upcomingBookings");
       } catch (error) {
         console.error("Error creating booking:", error);
         // Handle booking creation error
@@ -288,25 +299,29 @@ function FacilityList() {
       </Modal>
 
       {/* Confirmation Dialog */}
-      <Modal show={showConfirmationDialog} onHide={() => setShowConfirmationDialog(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Booking</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Facility: {selectedFacility?.facilityType}</p>
-          <p>Date: {selectedDate}</p>
-          <p>Timeslot Start Time: {selectedTimeslots[0]?.time}</p>
-          <p>Timeslot End Time: {selectedTimeslots[selectedTimeslots.length - 1]?.time}</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowConfirmationDialog(false)}>
-            Go Back
-          </Button>
-          <Button variant="primary" onClick={handleConfirmBooking}>
-            Confirm Booking
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {showConfirmationDialog && (
+        <Modal show={showConfirmationDialog} onHide={() => setShowConfirmationDialog(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Confirm Booking</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>Facility: {selectedFacility?.facilityType}</p>
+            <p>Date: {selectedDate}</p>
+            <p>Timeslot Start Time: {selectedTimeslots[0]?.time}</p>
+            {selectedEndTime && (
+              <p>Timeslot End Time: {selectedEndTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</p>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowConfirmationDialog(false)}>
+              Go Back
+            </Button>
+            <Button variant="primary" onClick={handleConfirmBooking}>
+              Confirm Booking
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
     </div>
   );
 }

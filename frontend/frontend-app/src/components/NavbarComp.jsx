@@ -44,8 +44,8 @@ function MyNavbar() {
               <Nav.Link as={Link} to="/create-facility">Create Facility</Nav.Link>
             )}
             <NavDropdown title="Booking Details" id="basic-nav-dropdown">
-              <NavDropdown.Item href="/bookings">Past Bookings</NavDropdown.Item>
-              <NavDropdown.Item href="/bookings">Upcoming Bookings</NavDropdown.Item>
+              <NavDropdown.Item href="/past-Bookings">Past Bookings</NavDropdown.Item>
+              <NavDropdown.Item href="/upcoming-Bookings">Upcoming Bookings</NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item href="/facilites">Book a facility</NavDropdown.Item>
             </NavDropdown>
