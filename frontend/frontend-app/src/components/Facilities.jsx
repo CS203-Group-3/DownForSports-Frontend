@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import MyNavbar from './NavbarComp';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { Modal, Button, ListGroup, Alert } from 'react-bootstrap';
-import { useNavigate } from "react-router-dom";
+import MyNavbar from "./NavbarComp";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Modal, Button, ListGroup, Card } from "react-bootstrap";
 
 function FacilityList() {
   const [facilities, setFacilities] = useState([]);
@@ -14,15 +13,24 @@ function FacilityList() {
   const [selectedTimeslots, setSelectedTimeslots] = useState([]);
   const [dates, setDates] = useState([]);
   const [timeslots, setTimeslots] = useState([]);
-  const [selectedTimeslotIds, setSelectedTimeslotIds] = useState([]); // Define selectedTimeslotIds
-  const navigate = useNavigate();
+  const [selectedTimeslotIds, setSelectedTimeslotIds] = useState([]);
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
-  const [bookingSuccess, setBookingSuccess] = useState(false); // Add booking success state
-  const [bookingFailure, setBookingFailure] = useState(false); // Add booking fail
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [bookingFailure, setBookingFailure] = useState(false);
   const [selectedEndTime, setSelectedEndTime] = useState(null);
+  const [totalCredits, setTotalCredits] = useState(0);
+  const [userRoles, setUserRoles] = useState([]);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [facilityToDelete, setFacilityToDelete] = useState(null);
 
   useEffect(() => {
-    axios.get("http://localhost:8080/api/facilities")
+    const jwtResponse = JSON.parse(localStorage.getItem("jwtResponse"));
+    if (jwtResponse && jwtResponse.roles) {
+      setUserRoles(jwtResponse.roles);
+    }
+
+    axios
+      .get("http://localhost:8080/api/facilities")
       .then((response) => {
         setFacilities(response.data);
       })
@@ -50,75 +58,82 @@ function FacilityList() {
 
   const fetchTimeslots = (facilityDateId) => {
     axios
-      .get(`http://localhost:8080/api/facilities/${selectedFacility.facilityId}/dates/${facilityDateId}/timeslots`)
+      .get(
+        `http://localhost:8080/api/facilities/${selectedFacility.facilityId}/dates/${facilityDateId}/timeslots`
+      )
       .then((response) => {
         console.log("Response from the server:", response.data);
-  
-        // Extract times (values) from the response object
+
         const timeslotsData = Object.entries(response.data).map(([timeslotId, time]) => ({
           timeslotId,
           time,
-          isAvailable: true, // You can set this based on your data
-          isSelected: false, // Initialize isSelected to false
+          isAvailable: true,
+          isSelected: false,
         }));
-  
-        // Set the timeslots data and reset the selected timeslot IDs
+
         setTimeslots(timeslotsData);
-        setSelectedTimeslotIds([]); // Reset selected timeslot IDs
+        setSelectedTimeslotIds([]);
         console.log("Timeslots:", timeslotsData);
       })
       .catch((error) => {
         console.error("Error fetching timeslots:", error);
       });
   };
-  
+
   const selectDate = (selectedDate, selectedDateId) => {
     setSelectedDate(selectedDate);
     setSelectedDateId(selectedDateId);
     setSelectedTimeslots([]);
     fetchTimeslots(selectedDateId);
   };
-  
+
   const isSelected = (timeslot) => {
     return selectedTimeslots.includes(timeslot);
   };
-  
+
+  const isAdjacent = (timeslot) => {
+    if (selectedTimeslots.length === 0) {
+      return true;
+    }
+
+    if (selectedTimeslots.length === 1) {
+      const selectedTime = new Date(selectedDate + " " + selectedTimeslots[0].time);
+      const newTime = new Date(selectedDate + " " + timeslot.time);
+      const timeDifference = Math.abs(newTime - selectedTime) / 36e5;
+      return timeDifference === 1;
+    }
+
+    return (
+      timeslot === selectedTimeslots[0] ||
+      timeslot === selectedTimeslots[selectedTimeslots.length - 1]
+    );
+  };
+
   const selectTimeslot = (timeslot) => {
     if (isSelected(timeslot)) {
-      setSelectedTimeslots(selectedTimeslots.filter((selected) => selected !== timeslot));
-      setSelectedTimeslotIds(selectedTimeslotIds.filter((id) => id !== timeslot.timeslotId));
+      if (
+        timeslot === selectedTimeslots[0] ||
+        timeslot === selectedTimeslots[selectedTimeslots.length - 1]
+      ) {
+        setSelectedTimeslots(selectedTimeslots.filter((selected) => selected !== timeslot));
+        setSelectedTimeslotIds(selectedTimeslotIds.filter((id) => id !== timeslot.timeslotId));
+      }
     } else {
       setSelectedTimeslots([...selectedTimeslots, timeslot]);
       setSelectedTimeslotIds([...selectedTimeslotIds, timeslot.timeslotId]);
     }
   };
 
-
-
-  const isAdjacent = (timeslot) => {
-    if (selectedTimeslots.length === 0) {
-      return true; // If no timeslots are selected, the new timeslot is adjacent.
-    }
-  
-    // Find the indexes of the selected timeslots.
-    const lastIndex = timeslots.findIndex((ts) => ts.id === selectedTimeslots[selectedTimeslots.length - 1].id);
-    const currentIndex = timeslots.findIndex((ts) => ts.id === timeslot.id);
-  
-    // Check if the new timeslot is the next one in the list.
-    return currentIndex === lastIndex + 1;
-  };
-
   const booking = () => {
     if (selectedFacility && selectedDateId && selectedTimeslotIds.length > 0) {
-      // Calculate the end time by adding an hour to the last selected time slot
       const lastSelectedTimeslot = selectedTimeslots[selectedTimeslots.length - 1];
       const endDateTime = new Date(selectedDate + " " + lastSelectedTimeslot.time);
       endDateTime.setHours(endDateTime.getHours() + 1);
-  
-      // Display the end time in the modal
+
+      const creditsRequired = selectedTimeslotIds.length * selectedFacility.creditCost;
+      setTotalCredits(creditsRequired);
+
       setSelectedEndTime(endDateTime);
-  
-      // Open the confirmation dialog
       setShowConfirmationDialog(true);
       setBookingSuccess(false);
       setBookingFailure(false);
@@ -126,63 +141,80 @@ function FacilityList() {
       console.error("Please select a facility, date, and at least one timeslot.");
     }
   };
-  
 
   const handleConfirmBooking = async () => {
     if (selectedFacility && selectedDateId && selectedTimeslotIds.length > 0) {
-      // Create a function to format the TimeSlots array
-      const formatTimeSlots = (timeslotIds, timeslotData) => {
-        return timeslotIds.map((timeslotId) => {
-          const timeslot = timeslotData.find((ts) => ts.timeslotId === timeslotId);
-          return {
-            timeSlotsId: timeslotId,
-            startTime: timeslot.time,
-          };
-        });
-      };
+      const timeSlotsData = selectedTimeslotIds.map((timeslotId) => {
+        const timeslot = timeslots.find((ts) => ts.timeslotId === timeslotId);
+        return timeslot.time;
+      });
 
-      // Format the TimeSlots array
-      const timeSlotsData = formatTimeSlots(selectedTimeslotIds, selectedTimeslots);
-
-      // Create the booking request
       const bookingRequest = {
-        userId: JSON.parse(localStorage.getItem('jwtResponse')).id,
+        userId: JSON.parse(localStorage.getItem("jwtResponse")).id,
         facilityId: selectedFacility.facilityId,
-        //timeBookingMade: new Date().toISOString(),
+        timeBookingMade: new Date().toISOString(),
         facilityDate: selectedDate,
         timeSlots: timeSlotsData,
       };
 
-      console.log("Booking Request:", bookingRequest);
+      console.log("Updated timeSlotsData:", timeSlotsData);
 
       try {
         const response = await axios.post("http://localhost:8080/api/bookings/makebooking", bookingRequest);
         console.log("Booking created:", response.data);
-        // Handle successful booking creation
 
-        // Show success message
         setBookingSuccess(true);
         setBookingFailure(false);
         setShowConfirmationDialog(false);
-
-        // Optional: Navigate to another page
-        navigate("/upcomingBookings");
+        setModalIsOpen(false);
       } catch (error) {
         console.error("Error creating booking:", error);
-        // Handle booking creation error
 
-        // Show failure message
         setBookingSuccess(false);
         setBookingFailure(true);
-        setShowConfirmationDialog(false);
       }
     } else {
       console.error("Please select a facility, date, and at least one timeslot.");
     }
   };
 
+  const openDeleteConfirmation = (facility) => {
+    setFacilityToDelete(facility);
+    setShowDeleteConfirmation(true); // Show the delete confirmation dialog
+  };
+  
+  const closeDeleteConfirmation = () => {
+    setFacilityToDelete(null);
+    setShowDeleteConfirmation(false); // Hide the delete confirmation dialog
+  };
+  
+  const deleteFacilityConfirmed = () => {
+    // Make sure to close the confirmation dialog after confirming
+    if(facilityToDelete) {
+      console.log("Cencelling facilily with facilityid: ", facilityToDelete.facilityId);
+      axios
+      .delete(`http://localhost:8080/api/facilities/${facilityToDelete.facilityId}`)
+      .then((response) => {
+        console.log("Facility deleted:", response.data);
+        // Refresh the list of facilities after deletion
+        axios
+          .get("http://localhost:8080/api/facilities")
+          .then((response) => {
+            setFacilities(response.data);
+          })
+          .catch((error) => {
+            console.error("Error fetching facilities:", error);
+          });
+      })
+      .catch((error) => {
+        console.error("Error deleting facility:", error);
+      });
+      closeDeleteConfirmation();
+    }
+  };
+  
+
   const openModal = (facility) => {
-    console.log("Clicked Facility:", facility);
     setSelectedFacility(facility);
     setSelectedDate(null);
     setSelectedDateId(null);
@@ -203,27 +235,49 @@ function FacilityList() {
     <div>
       <MyNavbar />
       <h1>Facility List</h1>
-        {bookingSuccess && (
-        <Alert variant="success">
-          Booking made successfully!
-        </Alert>
+      {bookingSuccess && (
+        <Card className="mb-3">
+          <Card.Body>
+            <Card.Text className="text-success">Booking made successfully!</Card.Text>
+          </Card.Body>
+        </Card>
       )}
-      {/* Display failure message */}
       {bookingFailure && (
-        <Alert variant="danger">
-          Booking failed. Please try again.
-        </Alert>
+        <Card className="mb-3">
+          <Card.Body>
+            <Card.Text className="text-danger">Booking failed. Please try again.</Card.Text>
+          </Card.Body>
+        </Card>
       )}
-      <ul>
-        {facilities.map((facility) => (
-          <li key={facility.facilityId}>
-            <strong>Facility Type:</strong> {facility.facilityType}
-            <br />
-            <strong>Description:</strong> {facility.description}
-            <Button onClick={() => openModal(facility)}>View Dates</Button>
-          </li>
-        ))}
-      </ul>
+
+      {facilities.map((facility, index) => (
+        <Card key={facility.facilityId} className="mb-3">
+          <Card.Header>{facility.facilityType}</Card.Header>
+          <Card.Body>
+            <Card.Text>
+              <strong>Description:</strong> {facility.description}
+              <br />
+              <strong>Open Time:</strong> {facility.openTime}
+              <br />
+              <strong>Closing Time:</strong> {facility.closingTime}
+              <br />
+              <strong>Credit Cost:</strong> {facility.creditCost}
+              <br />
+              <strong>Location:</strong> {facility.locationString}
+            </Card.Text>
+            <Card.Text>
+              <Button onClick={() => openModal(facility)}>View Dates</Button>
+              {userRoles.includes("ROLE_ADMIN") && (
+                <>
+                  <Button variant="danger" onClick={() => openDeleteConfirmation(facility)}>
+                    Delete Facility
+                  </Button>
+                </>
+              )}
+            </Card.Text>
+          </Card.Body>
+        </Card>
+      ))}
 
       <Modal show={modalIsOpen} onHide={closeModal}>
         <Modal.Header closeButton>
@@ -298,7 +352,6 @@ function FacilityList() {
         </Modal.Footer>
       </Modal>
 
-      {/* Confirmation Dialog */}
       {showConfirmationDialog && (
         <Modal show={showConfirmationDialog} onHide={() => setShowConfirmationDialog(false)}>
           <Modal.Header closeButton>
@@ -311,6 +364,7 @@ function FacilityList() {
             {selectedEndTime && (
               <p>Timeslot End Time: {selectedEndTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</p>
             )}
+            <p>Total Credits Required: {totalCredits}</p>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowConfirmationDialog(false)}>
@@ -322,6 +376,22 @@ function FacilityList() {
           </Modal.Footer>
         </Modal>
       )}
+      <Modal show={showDeleteConfirmation} onHide={closeDeleteConfirmation}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Facility</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Do you want to delete this facility?</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={closeDeleteConfirmation}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={deleteFacilityConfirmed}>
+            Confirm
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

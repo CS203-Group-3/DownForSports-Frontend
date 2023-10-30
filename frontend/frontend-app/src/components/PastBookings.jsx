@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
+import { Card } from 'react-bootstrap';
 
 function PastBookings() {
   const [pastBookings, setPastBookings] = useState([]);
@@ -22,30 +23,33 @@ function PastBookings() {
         console.error('Error fetching past bookings:', error);
       });
   }, [userId]);
-  
+
   return (
     <div>
       <MyNavbar />
       <h1>Past Bookings</h1>
       {pastBookings.length > 0 ? (
-        <ul>
+        <div>
           {pastBookings.map((booking, index) => (
-            <li key={index}>
-              <strong>Facility: </strong> {booking.facility}
-              <br />
-              <strong>Description: </strong> {booking.description}
-              <br />
-              <strong>Start Time: </strong> {booking.startTime}
-              <br />
-              <strong>End Time: </strong> {booking.endTime}
-              <br />
-              <strong>Date: </strong> {booking.date}
-              <br />
-              <strong>Location: </strong> {booking.location}
-              <br />
-            </li>
+            <Card key={index} className="mb-3">
+              <Card.Header>Past Booking</Card.Header>
+              <Card.Body>
+                <Card.Title>Facility: {booking.facility}</Card.Title>
+                <Card.Text>
+                  <strong>Description:</strong> {booking.description}
+                  <br />
+                  <strong>Start Time:</strong> {booking.startTime}
+                  <br />
+                  <strong>End Time:</strong> {booking.endTime}
+                  <br />
+                  <strong>Date:</strong> {booking.date}
+                  <br />
+                  <strong>Location:</strong> {booking.location}
+                </Card.Text>
+              </Card.Body>
+            </Card>
           ))}
-        </ul>
+        </div>
       ) : (
         <p>You have no past bookings.</p>
       )}
@@ -54,3 +58,4 @@ function PastBookings() {
 }
 
 export default PastBookings;
+
