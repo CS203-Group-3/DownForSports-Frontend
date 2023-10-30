@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect} from 'react';
 import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
-import { Card, Button, Modal } from 'react-bootstrap';
+import { Card, Button, Modal, Alert } from 'react-bootstrap';
 
 function UpcomingBookings() {
   const [upcomingBookings, setUpcomingBookings] = useState([]);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [bookingToCancel, setBookingToCancel] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null); // New state variable for success message
   const userId = JSON.parse(localStorage.getItem('jwtResponse')).id;
 
   useEffect(() => {
@@ -38,13 +39,28 @@ function UpcomingBookings() {
 
   const confirmCancelBooking = () => {
     if (bookingToCancel) {
-      console.log('Canceling booking with bookingId:', bookingToCancel.bookingId); // Log the bookingId
+      console.log('Canceling booking with bookingId:', bookingToCancel.bookingId);
       axios
         .post("http://localhost:8080/api/bookings/cancelbooking", { bookingId: bookingToCancel.bookingId })
         .then((response) => {
           console.log("Booking canceled:", response.data);
           // Handle success and display a confirmation message
-          // You can also refresh the list of upcoming bookings
+          setSuccessMessage("Booking deleted successfully");
+
+          // Refresh the list of upcoming bookings
+          axios
+            .get("http://localhost:8080/api/bookings/viewupcomingbookings", {
+              params: {
+                userId: userId,
+              },
+            })
+            .then((refreshedData) => {
+              setUpcomingBookings(refreshedData.data);
+            })
+            .catch((error) => {
+              console.error('Error fetching upcoming bookings after cancellation:', error);
+            });
+
           closeCancelModal();
         })
         .catch((error) => {
@@ -59,6 +75,11 @@ function UpcomingBookings() {
     <div>
       <MyNavbar />
       <h1>Upcoming Bookings</h1>
+      {successMessage && (
+        <Alert variant="success" onClose={() => setSuccessMessage(null)} dismissible>
+          {successMessage}
+        </Alert>
+      )}
       {upcomingBookings.length > 0 ? (
         <div>
           {upcomingBookings.map((booking, index) => (
