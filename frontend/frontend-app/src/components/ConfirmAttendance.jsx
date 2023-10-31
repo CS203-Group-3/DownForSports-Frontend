@@ -1,12 +1,28 @@
-import React, { useState } from 'react';
-import { Modal, Button, Card } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import MyNavbar from './NavbarComp';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
+import { Card, Button, Modal } from 'react-bootstrap';
+
 
 function ConfirmAttendance() {
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [bookingId, setBookingId] = useState(null);
-  const [bookings, setBookings] = useState([]);
 
+  useEffect(() => {
+    // Fetch all bookings from the API
+    axios.get('http://localhost:8080/api/bookings/')
+      .then((response) => {
+        setBookings(response.data); // Set the retrieved bookings in the state
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching bookings:", error);
+        setLoading(false);
+      });
+  }, []);
 
   const handleOpenModal = (id) => {
     setBookingId(id);
@@ -18,13 +34,14 @@ function ConfirmAttendance() {
   };
 
   const handleConfirmAttendance = (attendanceStatus) => {
-    axios.post('http://localhost:8080/api/confirmbookingattendance', {
+    axios.post('http://localhost:8080/api/bookings/confirmbookingattendance', {
       bookingId: bookingId,
       attendanceStatus: attendanceStatus
     })
     .then((response) => {
       console.log('Attendance confirmed successfully.');
       handleCloseModal();
+      window.location.reload(); // Reload the page
     })
     .catch((error) => {
       console.error('Error confirming attendance:', error);
@@ -33,6 +50,7 @@ function ConfirmAttendance() {
 
   return (
     <div>
+        <MyNavbar />
       <h1>Confirm Attendance</h1>
       <div className="container">
         <div className="row">

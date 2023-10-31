@@ -10,6 +10,7 @@ import ChangePassword from "./components/ChangePassword";
 import UpcomingBookings from "./components/UpcomingBookings";
 import PastBookings from "./components/PastBookings";
 import CreateBM from "./components/CreateBM";
+import ConfirmAttendance from "./components/ConfirmAttendance";
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
           <Route path="/upcoming-Bookings" element={<UpcomingBookings />} />
           <Route path="/past-Bookings" element={<PastBookings />} />
           <Route path="/create-bm" element={<CreateBM />} />
+          <Route path="/confirm-attendance" element={<ConfirmAttendance />} />
         </Routes>
       </BrowserRouter>
     </div>

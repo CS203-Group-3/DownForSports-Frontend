@@ -6,13 +6,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const HomePage = () => {
   const navigate = useNavigate();
 
-  // Logout function to remove the JWT token from localStorage
-  const logout = () => {
-    localStorage.removeItem('jwtResponse');
-    // Redirect to the login page or any other desired page
-    navigate('/login');
-  };
-
   useEffect(() => {
     // Check if the JWT token is present in localStorage
     const jwtToken = localStorage.getItem('jwtResponse');
