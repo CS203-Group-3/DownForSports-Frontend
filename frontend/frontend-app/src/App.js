@@ -9,6 +9,7 @@ import FacilityList from "./components/Facilities";
 import ChangePassword from "./components/ChangePassword";
 import UpcomingBookings from "./components/UpcomingBookings";
 import PastBookings from "./components/PastBookings";
+import CreateBM from "./components/CreateBM";
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
           <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/upcoming-Bookings" element={<UpcomingBookings />} />
           <Route path="/past-Bookings" element={<PastBookings />} />
+          <Route path="/create-bm" element={<CreateBM />} />
         </Routes>
       </BrowserRouter>
     </div>

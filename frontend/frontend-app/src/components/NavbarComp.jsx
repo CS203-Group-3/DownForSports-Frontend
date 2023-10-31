@@ -40,15 +40,20 @@ function MyNavbar() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/facilities">Facilities</Nav.Link>
-            {userRoles.includes('ROLE_ADMIN') && (
-              <Nav.Link as={Link} to="/create-facility">Create Facility</Nav.Link>
-            )}
             <NavDropdown title="Booking Details" id="basic-nav-dropdown">
               <NavDropdown.Item href="/past-Bookings">Past Bookings</NavDropdown.Item>
               <NavDropdown.Item href="/upcoming-Bookings">Upcoming Bookings</NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item href="/facilites">Book a facility</NavDropdown.Item>
             </NavDropdown>
+            {userRoles.includes('ROLE_ADMIN') && (
+            <NavDropdown title="Administrative" id="basic-nav-dropdown">
+              <NavDropdown.Item href="/create-facility">Create Facility</NavDropdown.Item>
+              <NavDropdown.Item href="/create-bm">Create Booking Manager</NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item href="/facilites">Book a facility</NavDropdown.Item>
+            </NavDropdown>
+            )}
           </Nav>
           <Nav>
             <NavDropdown title={<img src={userProfilePicture} alt="Profile" style={profilePictureStyle} />} id="basic-nav-dropdown">
