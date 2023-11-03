@@ -22,6 +22,7 @@ function FacilityList() {
   const [userRoles, setUserRoles] = useState([]);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [facilityToDelete, setFacilityToDelete] = useState(null);
+  const [loading, setLoading] = useState(false); // Add the loading state
 
   useEffect(() => {
     const jwtResponse = JSON.parse(localStorage.getItem("jwtResponse"));
@@ -158,6 +159,8 @@ function FacilityList() {
       };
 
       console.log("Updated timeSlotsData:", timeSlotsData);
+      // Set loading to true when the API request is initiated
+      setLoading(true);
 
       try {
         const response = await axios.post("http://localhost:8080/api/bookings/makebooking", bookingRequest);
@@ -172,6 +175,9 @@ function FacilityList() {
 
         setBookingSuccess(false);
         setBookingFailure(true);
+      }finally {
+        // Set loading to false after the API request is completed (success or failure)
+        setLoading(false);
       }
     } else {
       console.error("Please select a facility, date, and at least one timeslot.");
@@ -235,6 +241,12 @@ function FacilityList() {
     <div>
       <MyNavbar />
       <h1>Facility List</h1>
+      {loading && (
+        // Display a loading indicator while the API request is in progress
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      )}
       {bookingSuccess && (
         <Card className="mb-3">
           <Card.Body>
