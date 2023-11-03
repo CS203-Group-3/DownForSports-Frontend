@@ -11,6 +11,8 @@ import UpcomingBookings from "./components/UpcomingBookings";
 import PastBookings from "./components/PastBookings";
 import CreateBM from "./components/CreateBM";
 import ConfirmAttendance from "./components/ConfirmAttendance";
+import CreditRequest from "./components/CreditRequest";
+import AcceptCreditRequest from "./components/AcceptCreditRequest";
 
 
 function App() {
@@ -30,6 +32,8 @@ function App() {
           <Route path="/past-Bookings" element={<PastBookings />} />
           <Route path="/create-bm" element={<CreateBM />} />
           <Route path="/confirm-attendance" element={<ConfirmAttendance />} />
+          <Route path="/credit-request" element={<CreditRequest />} />
+          <Route path="/accept-credit-request" element={<AcceptCreditRequest />} />
         </Routes>
       </BrowserRouter>
     </div>
