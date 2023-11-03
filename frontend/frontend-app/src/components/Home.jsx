@@ -9,10 +9,14 @@ const HomePage = () => {
   useEffect(() => {
     // Check if the JWT token is present in localStorage
     const jwtToken = localStorage.getItem('jwtResponse');
-
+    
     // If not authenticated, redirect to the login page
     if (jwtToken == null) {
+      console.log("heheh")
       navigate('/login');
+    } else {
+      console.log("wee")
+      console.log(jwtToken);
     }
   }, [navigate]);
 
