@@ -12,17 +12,14 @@ const HomePage = () => {
     
     // If not authenticated, redirect to the login page
     if (jwtToken == null) {
-      console.log("heheh")
       navigate('/login');
     } else {
-      console.log("wee")
       console.log(jwtToken);
     }
   }, [navigate]);
 
   const backgroundStyle = {
-    backgroundImage: `url('https://external-preview.redd.it/M6I1JzqgXB9iUqJkh9SXcM-lcgjhT5GRQkHcdka0Lns.jpg?auto=webp&s=69047080d63afc8e80774d5f24258b2ade078f65')`,
-    //backgroundImage: `url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/f1ba3ad4-e8e7-4ff1-9220-86dc86878beb/d9cafik-05d24e66-2fdb-4a11-a173-a5579d3f253e.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2YxYmEzYWQ0LWU4ZTctNGZmMS05MjIwLTg2ZGM4Njg3OGJlYlwvZDljYWZpay0wNWQyNGU2Ni0yZmRiLTRhMTEtYTE3My1hNTU3OWQzZjI1M2UuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.TLw678YtqTy6eBaFnZmDKuJcQKAGxqEzo-EzWArDOSY')`,
+    backgroundImage: `url('https://keeble-sample.s3.ap-southeast-1.amazonaws.com/%E2%80%94Pngtree%E2%80%94sports+basketball+backplane_780138.jpg')`,
     backgroundSize: 'cover',
     backgroundPosition: 'center bottom',
     backgroundRepeat: 'no-repeat',
@@ -31,14 +28,43 @@ const HomePage = () => {
     opacity: '1',
   };
 
+  const centerContainer = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '70%', // Adjusted the height
+  };
+
+  const buttonContainer = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  };
+
+  const buttonStyle = {
+    backgroundColor: '#007BFF',
+    color: 'white',
+    border: 'none',
+    padding: '10px 20px',
+    fontSize: '16px',
+    cursor: 'pointer',
+  };
+  
+  const navigateToFacilities = () => {
+    navigate('/facilities');
+  };
+
   return (
     <div>
       <MyNavbar />
       <div style={backgroundStyle}>
-        
-        <div className="container">
+        <div className="container" style={centerContainer}>
           <div className="row">
-            <h1>Welcome to the facility booking page</h1>
+            <h1 style={{ textAlign: 'center' }}>Down for a game?</h1>
+            <div style={buttonContainer}>
+              <button style={buttonStyle} onClick={navigateToFacilities}>Book a Facility today</button>
+            </div>
           </div>
         </div>
       </div>
@@ -47,6 +73,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
-
-
