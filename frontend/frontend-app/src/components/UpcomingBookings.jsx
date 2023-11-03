@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
-import { Card, Button, Modal } from 'react-bootstrap';
+import { Card, Button, Modal, Alert } from 'react-bootstrap';
 
 function UpcomingBookings() {
   const [upcomingBookings, setUpcomingBookings] = useState([]);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [bookingToCancel, setBookingToCancel] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null); 
   const userId = JSON.parse(localStorage.getItem('jwtResponse')).id;
 
   useEffect(() => {
@@ -45,7 +46,21 @@ function UpcomingBookings() {
         .then((response) => {
           console.log("Booking canceled:", response.data);
           // Handle success and display a confirmation message
+          setSuccessMessage("Booking deleted successfully");
           // You can also refresh the list of upcoming bookings
+          // Refresh the list of upcoming bookings
+          axios
+            .get("http://localhost:8080/api/bookings/viewupcomingbookings", {
+              params: {
+                userId: userId,
+              },
+            })
+            .then((refreshedData) => {
+              setUpcomingBookings(refreshedData.data);
+            })
+            .catch((error) => {
+              console.error('Error fetching upcoming bookings after cancellation:', error);
+            });
           closeCancelModal();
         })
         .catch((error) => {
@@ -59,37 +74,41 @@ function UpcomingBookings() {
   return (
     <div>
       <MyNavbar />
-      <h1>Upcoming Bookings</h1>
-      {upcomingBookings.length > 0 ? (
-               <div>
-               {upcomingBookings.map((booking, index) => (
-                         <Card key={index} className="mb-3">
-                         <Card.Body>
-                           <Card.Title>Facility: {booking.facility}</Card.Title>
-                           <Card.Text>
-                             <strong>Description:</strong> {booking.description}
-                             <br />
-                             <strong>Start Time:</strong> {booking.startTime}
-                             <br />
-                             <strong>End Time:</strong> {booking.endTime}
-                             <br />
-                             <strong>Date:</strong> {booking.date}
-                             <br />
-                             <strong>Location:</strong> {booking.location}
-                           </Card.Text>
-                         </Card.Body>
-                         <Card.Footer>
-                           <Button variant="danger" onClick={() => openCancelModal(booking)}>
-                             Cancel Booking
-                           </Button>
-                         </Card.Footer>
-                       </Card>
-                     ))}
-                             </div>
-      ) : (
-        <p>You have no upcoming bookings.</p>
-      )}
-
+            <h1>Upcoming Bookings</h1>
+            {successMessage && (
+              <Alert variant="success" onClose={() => setSuccessMessage(null)} dismissible>
+                {successMessage}
+              </Alert>
+            )}
+            {upcomingBookings.length > 0 ? (
+              <div>
+                {upcomingBookings.map((booking, index) => (
+                  <Card key={index} className="mb-3">
+                    <Card.Body>
+                      <Card.Title>Facility: {booking.facility}</Card.Title>
+                      <Card.Text>
+                        <strong>Description:</strong> {booking.description}
+                        <br />
+                        <strong>Start Time:</strong> {booking.startTime}
+                        <br />
+                        <strong>End Time:</strong> {booking.endTime}
+                        <br />
+                        <strong>Date:</strong> {booking.date}
+                        <br />
+                        <strong>Location:</strong> {booking.location}
+                      </Card.Text>
+                    </Card.Body>
+                    <Card.Footer>
+                      <Button variant="danger" onClick={() => openCancelModal(booking)}>
+                        Cancel Booking
+                      </Button>
+                    </Card.Footer>
+                  </Card>
+                  ))}
+                  </div>
+                  ) : (
+                    <p>You have no upcoming bookings.</p>
+                  )}
       <Modal show={showCancelModal} onHide={closeCancelModal}>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Cancellation</Modal.Title>
