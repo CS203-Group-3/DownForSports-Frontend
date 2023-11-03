@@ -52,7 +52,6 @@ function MyNavbar() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/facilities">Facilities</Nav.Link>
-            <Nav.Link as={Link} to="/credit-request">Credit Request</Nav.Link>
             <NavDropdown title="Booking Details" id="basic-nav-dropdown">
               <NavDropdown.Item href="/past-Bookings">Past Bookings</NavDropdown.Item>
               <NavDropdown.Item href="/upcoming-Bookings">Upcoming Bookings</NavDropdown.Item>
