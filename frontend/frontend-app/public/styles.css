@@ -1,0 +1,33 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+.BookingSlot {
+  background-color: #00c09d;
+  width: 50px;
+  height: 20px;
+  color: white;
+  padding: 7px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  margin-right: 5px;
+  font-size: 14px;
+  border-radius: 5px;
+  vertical-align: center;
+  text-align: center;
+  display: inline-flex;
+}
+
+.BookingSlot:hover {
+  background-color: #2ca893;
+  cursor: pointer;
+}
+
+.BookingDate {
+  background-color: #aadddd;
+  width: 250px;
+  margin: 5px 5px 5px 5px;
+  display: inline-block;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
