@@ -50,22 +50,22 @@ function MyNavbar() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/facilities">Facilities</Nav.Link>
+            <Nav.Link as={Link} to="/credit-request">Credit Request</Nav.Link>
             <NavDropdown title="Booking Details" id="basic-nav-dropdown">
               <NavDropdown.Item href="/past-Bookings">Past Bookings</NavDropdown.Item>
               <NavDropdown.Item href="/upcoming-Bookings">Upcoming Bookings</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="/facilites">Book a facility</NavDropdown.Item>
             </NavDropdown>
             {userRoles.includes('ROLE_ADMIN') && (
             <NavDropdown title="Administrative" id="basic-nav-dropdown">
               <NavDropdown.Item href="/create-facility">Create Facility</NavDropdown.Item>
               <NavDropdown.Item href="/create-bm">Create Booking Manager</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="/facilites">Book a facility</NavDropdown.Item>
             </NavDropdown>
             )}
             {userRoles.includes('ROLE_BOOKINGMANAGER') && (
-            <Nav.Link as={Link} to="/confirm-attendance">Confirm Attendance</Nav.Link>
+            <NavDropdown title="Administrative" id="basic-nav-dropdown">
+              <NavDropdown.Item href="/confirm-attendance">Confirm Attendance</NavDropdown.Item>
+              <NavDropdown.Item href="/accept-credit-request">Accept Credit Requests</NavDropdown.Item>
+            </NavDropdown>
             )}
           </Nav>
           <Nav>

@@ -70,20 +70,22 @@ function CreateFacilityForm() {
           ></textarea>
         </div>
         <div className="form-group">
-          <label>Open Time</label>
+          <label>Open Time (hh:mm)</label>
           <input
             type="text"
             className="form-control"
+            placeholder="e.g. 09:00"
             value={openTime}
             onChange={(e) => setOpenTime(e.target.value)}
             required
           />
         </div>
         <div className="form-group">
-          <label>Closing Time</label>
+          <label>Closing Time (hh:mm)</label>
           <input
             type="text"
             className="form-control"
+            placeholder="e.g. 18:00"
             value={closingTime}
             onChange={(e) => setClosingTime(e.target.value)}
             required
@@ -94,6 +96,7 @@ function CreateFacilityForm() {
           <input
             type="text"
             className="form-control"
+            placeholder="e.g. 50"
             value={creditCost}
             onChange={(e) => setCreditCost(e.target.value)}
             required
