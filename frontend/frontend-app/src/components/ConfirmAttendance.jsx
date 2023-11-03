@@ -5,59 +5,7 @@ import axios from 'axios';
 import { Tabs, Tab, Card, Button, Modal } from 'react-bootstrap'; // Import Tabs and Tab from React-Bootstrap
 
 function ConfirmAttendance() {
-  const [bookings, setBookings] = useState([
-    {
-      bookingId: 1,
-      facility: "Sample Facility 1",
-      description: "Sample Description 1",
-      startTime: "2023-11-01 09:00",
-      endTime: "2023-11-01 11:00",
-      date: "2023-11-01",
-      location: "Sample Location 1",
-      bookingAttendanceChecked: false,
-    },
-    {
-      bookingId: 2,
-      facility: "Sample Facility 2",
-      description: "Sample Description 2",
-      startTime: "2023-11-02 14:00",
-      endTime: "2023-11-02 16:00",
-      date: "2023-11-02",
-      location: "Sample Location 2",
-      bookingAttendanceChecked: true,
-    },
-    {
-      bookingId: 3,
-      facility: "Sample Facility 3",
-      description: "Sample Description 3",
-      startTime: "2023-11-01 14:00",
-      endTime: "2023-11-01 16:00",
-      date: "2023-11-01",
-      location: "Sample Location 3",
-      bookingAttendanceChecked: true,
-    },
-    {
-      bookingId: 4,
-      facility: "Sample Facility 4",
-      description: "Sample Description 4",
-      startTime: "2023-11-03 14:00",
-      endTime: "2023-11-03 16:00",
-      date: "2023-11-03",
-      location: "Sample Location 4",
-      bookingAttendanceChecked: false,
-    },
-    {
-      bookingId: 5,
-      facility: "Sample Facility 5",
-      description: "Sample Description 5",
-      startTime: "2023-11-04 14:00",
-      endTime: "2023-11-04 16:00",
-      date: "2023-11-04",
-      location: "Sample Location 5",
-      bookingAttendanceChecked: false,
-    },
-    // Add more sample bookings as needed
-  ]);
+  const [bookings, setBookings] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
