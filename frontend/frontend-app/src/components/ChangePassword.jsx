@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 function ChangePassword() {
   const [oldPassword, setOldPassword] = useState('');
@@ -9,6 +10,7 @@ function ChangePassword() {
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const navigate = useNavigate(); // Get the navigate function
 
   const handleChangePassword = () => {
     setError(null);
@@ -33,6 +35,8 @@ function ChangePassword() {
         .then((response) => {
           console.log('Password changed successfully.');
           setSuccessMessage('Password changed successfully');
+          // Automatically log out the user after changing the password
+          logout();
         })
         .catch((error) => {
           console.error('Error changing password:', error);
@@ -44,6 +48,23 @@ function ChangePassword() {
       setError('New passwords do not match.');
     }
   };
+
+    // Logout function to remove the JWT token from localStorage
+    function logout() {
+      const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
+      // Retrieve the user's ID or userID from your front-end
+      const userId = JSON.parse(localStorage.getItem('jwtResponse')).id; // Replace with your logic to get the user's ID
+      axios.delete(`http://localhost:8080/api/user/logout/${userId}`)
+        .then((response) => {
+          // Handle successful logout, e.g., clear user data in the front-end
+          localStorage.removeItem('jwtResponse');
+          navigate('/login'); // Redirect to the login page or any desired page
+        })
+        .catch((error) => {
+          // Handle any errors during the logout process
+          console.error("Error logging out:", error);
+        });
+    }
 
   return (
     <div>

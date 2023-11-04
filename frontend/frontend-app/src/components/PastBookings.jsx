@@ -7,32 +7,42 @@ import { Card, Button, Modal, Form } from 'react-bootstrap';
 function PastBookings() {
   const [pastBookings, setPastBookings] = useState([
     {
+      bookingId: 1,
       facility: "Sample Facility 1",
       description: "Sample Description 1",
       startTime: "2023-10-01 09:00",
       endTime: "2023-10-01 11:00",
       date: "2023-10-01",
       location: "Sample Location 1",
+      bookingAttendanceChecked: true,
+      attendanceStatus: 0, // Set to true or false based on your test cases
     },
     {
+      bookingId: 2,
       facility: "Sample Facility 2",
       description: "Sample Description 2",
       startTime: "2023-10-02 14:00",
       endTime: "2023-10-02 16:00",
       date: "2023-10-02",
       location: "Sample Location 2",
+      bookingAttendanceChecked: false,
+      attendanceStatus: 1, // Set to true or false based on your test cases
     },
     {
+      bookingId: 3,
       facility: "Sample Facility 3",
       description: "Sample Description 3",
       startTime: "2023-10-03 10:00",
       endTime: "2023-10-03 12:00",
       date: "2023-10-03",
       location: "Sample Location 3",
+      bookingAttendanceChecked: true, 
+      attendanceStatus: -1,// Set to true or false based on your test cases
     },
     // Add more sample past bookings as needed
   ]);
 
+  const [sentCreditRequests, setSentCreditRequests] = useState([]); // Track sent requests
   const [showModal, setShowModal] = useState(false);
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
@@ -73,13 +83,19 @@ function PastBookings() {
       details: description,
       bookingId: bookingIdForCreditAppeal,
     };
-  
+
     axios
       .post("http://localhost:8080/api/bookings/creditrequest", creditRequestData)
       .then((response) => {
         console.log("Credit request created:", response.data);
         setConfirmationMessage("Request sent successfully");
         setShowConfirmationModal(true);
+        closeModal(); // Close the credit appeal modal after sending the request
+        // Add the bookingId to the sent requests
+        setSentCreditRequests((prevSentRequests) => [
+          ...prevSentRequests,
+          bookingIdForCreditAppeal,
+        ]);
       })
       .catch((error) => {
         console.error("Error creating credit request:", error);
@@ -87,7 +103,7 @@ function PastBookings() {
         setShowConfirmationModal(true);
       });
   };
-  
+
   const closeConfirmationModal = () => {
     setShowConfirmationModal(false);
   };
@@ -113,13 +129,21 @@ function PastBookings() {
                   <strong>Date:</strong> {booking.date}
                   <br />
                   <strong>Location:</strong> {booking.location}
+                  <br />
+                  {booking.attendanceStatus === -1 ? (
+                    sentCreditRequests.includes(booking.bookingId) ? (
+                      <span>Request sent</span>
+                    ) : (
+                      <Button
+                        variant="primary"
+                        onClick={() => openModal(booking.bookingId)}
+                      >
+                        Credit Appeal
+                      </Button>
+                    )
+                  ) : null}
                 </Card.Text>
               </Card.Body>
-              <Card.Footer>
-                <Button variant="primary" onClick={() => openModal(booking.bookingId)}>
-                  Credit Appeal
-                </Button>
-              </Card.Footer>
             </Card>
           ))}
         </div>
@@ -136,11 +160,10 @@ function PastBookings() {
             <Form.Group>
               <Form.Label>Amount</Form.Label>
               <Form.Control
-                type="number"
+                type="text"
                 placeholder="Enter amount"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                required
               />
             </Form.Group>
             <Form.Group>
@@ -151,7 +174,6 @@ function PastBookings() {
                 placeholder="Enter description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                required
               />
             </Form.Group>
           </Form>
@@ -160,7 +182,10 @@ function PastBookings() {
           <Button variant="secondary" onClick={closeModal}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleFormSubmit}>
+          <Button
+            variant="primary"
+            onClick={handleFormSubmit}
+          >
             Submit
           </Button>
         </Modal.Footer>
@@ -184,4 +209,3 @@ function PastBookings() {
 }
 
 export default PastBookings;
-
