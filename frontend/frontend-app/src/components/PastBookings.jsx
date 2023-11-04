@@ -5,43 +5,7 @@ import axios from 'axios';
 import { Card, Button, Modal, Form } from 'react-bootstrap';
 
 function PastBookings() {
-  const [pastBookings, setPastBookings] = useState([
-    {
-      bookingId: 1,
-      facility: "Sample Facility 1",
-      description: "Sample Description 1",
-      startTime: "2023-10-01 09:00",
-      endTime: "2023-10-01 11:00",
-      date: "2023-10-01",
-      location: "Sample Location 1",
-      bookingAttendanceChecked: true,
-      attendanceStatus: 0, // Set to true or false based on your test cases
-    },
-    {
-      bookingId: 2,
-      facility: "Sample Facility 2",
-      description: "Sample Description 2",
-      startTime: "2023-10-02 14:00",
-      endTime: "2023-10-02 16:00",
-      date: "2023-10-02",
-      location: "Sample Location 2",
-      bookingAttendanceChecked: false,
-      attendanceStatus: 1, // Set to true or false based on your test cases
-    },
-    {
-      bookingId: 3,
-      facility: "Sample Facility 3",
-      description: "Sample Description 3",
-      startTime: "2023-10-03 10:00",
-      endTime: "2023-10-03 12:00",
-      date: "2023-10-03",
-      location: "Sample Location 3",
-      bookingAttendanceChecked: true, 
-      attendanceStatus: -1,// Set to true or false based on your test cases
-    },
-    // Add more sample past bookings as needed
-  ]);
-
+  const [pastBookings, setPastBookings] = useState([]);
   const [sentCreditRequests, setSentCreditRequests] = useState([]); // Track sent requests
   const [showModal, setShowModal] = useState(false);
   const [amount, setAmount] = useState('');
@@ -130,7 +94,7 @@ function PastBookings() {
                   <br />
                   <strong>Location:</strong> {booking.location}
                   <br />
-                  {booking.attendanceStatus === -1 ? (
+                  {booking.bookingAttended === false ? (
                     sentCreditRequests.includes(booking.bookingId) ? (
                       <span>Request sent</span>
                     ) : (
