@@ -46,7 +46,7 @@ function UpcomingBookings() {
       .catch((error) => {
         console.error('Error fetching upcoming bookings:', error);
       });
-  }, [navigate, jwtResponse]);
+  }, [navigate]);
 
   const openCancelModal = (booking) => {
     setBookingToCancel(booking);
