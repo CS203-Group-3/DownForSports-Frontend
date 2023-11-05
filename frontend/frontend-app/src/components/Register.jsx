@@ -148,7 +148,7 @@ function Register() {
             {/* <button type="submit" class="btn btn-primary mt-4" onClick={save}>
               Register
             </button> */}
-            <OTPModal />
+            <OTPModal email={email} username={username} password={password} />
           </form>
           <p className="mt-3">
             Already created an account? <a href="/login">Log in here</a>
