@@ -10,11 +10,7 @@ function Profile() {
 
     // Retrieve the jwtResponse from localStorage
     useEffect(() => {
-      const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
-
-      // console.log(jwtResponse.accessToken)
-
-      const userId = jwtResponse.id;
+      const userId = JSON.parse(localStorage.getItem('jwtResponse')).id;
       axios.get(`http://localhost:8080/api/user/details/${userId}`, getAxiosConfig())
             .then(res => {
             const profile = {

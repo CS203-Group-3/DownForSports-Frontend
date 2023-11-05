@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { Card, Button, Modal, Form, Alert } from 'react-bootstrap'; // Import Alert component
 import { getAxiosConfig } from './Headers';
+import { useNavigate } from 'react-router-dom';
 
 function AcceptCreditRequest() {
   const [creditRequests, setCreditRequests] = useState([]);
@@ -11,6 +12,7 @@ function AcceptCreditRequest() {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false); // State variable for success message
   const [showErrorMessage, setShowErrorMessage] = useState(false); // State variable for error message
   const [amount, setAmount] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Make an API call to fetch credit requests data when the component mounts
@@ -20,8 +22,9 @@ function AcceptCreditRequest() {
       })
       .catch((error) => {
         console.error('Error fetching credit requests:', error);
+        navigate('/login');
       });
-  }, []);
+  }, [navigate]);
 
   const openModal = (amount) => {
     setAmount(amount);
@@ -32,53 +35,33 @@ function AcceptCreditRequest() {
     setShowModal(false);
   };
 
-  const handleConfirmAction = (action) => {
-    if (action === 'Accept') {
-      // Handle the Accept action
-      axios
-        .post("http://localhost:8080/api/bookings/creditrequest/confirm",
-        {
-          userID: JSON.parse(localStorage.getItem('jwtResponse')).id,
-          refundAmount: amount
-        }, 
-        {
-          headers: {
-            Authorization : JSON.parse(localStorage.getItem('jwtResponse')).accessToken,
-            withCredentials: true,
-          },
-        }
-        )
-        .then(() => {
-          console.log('Credit request processed successfully');
-          setShowModal(false);
-          window.location.reload();
-          setShowSuccessMessage(true);
-          setShowErrorMessage(false);
-        })
-        .catch((error) => {
-          console.error('Error processing credit request:', error);
-          setShowErrorMessage(true);
-          setShowSuccessMessage(false);
-        });
-    } else if (action === 'Decline') {
-      // Handle the Decline action
-      axios
-        .post("http://localhost:8080/api/bookings/creditrequest/confirm", {
-          userID: JSON.parse(localStorage.getItem('jwtResponse')).id,
-          refundAmount: 0
-        }, getAxiosConfig())
-        .then(() => {
-          console.log('Credit request declined successfully');
-          setShowModal(false);
-          setShowSuccessMessage(true);
-          setShowErrorMessage(false);
-        })
-        .catch((error) => {
-          console.error('Error declining credit request:', error);
-          setShowErrorMessage(true);
-          setShowSuccessMessage(false);
-        });
-    }
+  const handleConfirmAction = () => {
+    // Handle the Accept action
+    axios
+      .post("http://localhost:8080/api/bookings/creditrequest/confirm",
+      {
+        userID: JSON.parse(localStorage.getItem('jwtResponse')).id,
+        refundAmount: amount
+      }, 
+      {
+        headers: {
+          Authorization : JSON.parse(localStorage.getItem('jwtResponse')).accessToken,
+          withCredentials: true,
+        },
+      }
+      )
+      .then(() => {
+        console.log('Credit request processed successfully');
+        setShowModal(false);
+        window.location.reload();
+        setShowSuccessMessage(true);
+        setShowErrorMessage(false);
+      })
+      .catch((error) => {
+        console.error('Error processing credit request:', error);
+        setShowErrorMessage(true);
+        setShowSuccessMessage(false);
+      });
   };
 
   const maxAmount = creditRequests.length > 0 ? creditRequests[0].bookingResponse.amount : 0;
@@ -122,7 +105,7 @@ function AcceptCreditRequest() {
                   <strong>Location:</strong> {creditRequest.bookingResponse.location}
                   <br />
                 </Card.Text>
-                <Button variant="primary" onClick={() => openModal(creditRequest.amount)}>
+                <Button variant="success" onClick={() => openModal(creditRequest.amount)}>
                   Confirm
                 </Button>
               </Card.Body>
@@ -154,10 +137,7 @@ function AcceptCreditRequest() {
           <Button variant="secondary" onClick={closeModal}>
             Go Back
           </Button>
-          <Button variant="danger" onClick={() => handleConfirmAction("Decline")}>
-            Decline
-          </Button>
-          <Button variant="success" onClick={() => handleConfirmAction("Accept")}>
+          <Button variant="success" onClick={handleConfirmAction}>
             Accept
           </Button>
         </Modal.Footer>

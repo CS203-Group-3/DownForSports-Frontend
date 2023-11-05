@@ -3,6 +3,7 @@ import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { Button, Modal, Form, Alert } from 'react-bootstrap';
+import { getAxiosConfig } from './Headers';
 
 function CreateBM() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -50,11 +51,7 @@ function CreateBM() {
   
     // Send a POST request to create the BM account
     axios
-      .post("http://localhost:8080/api/auth/registerBM", requestBody, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+      .post("http://localhost:8080/api/auth/registerBM", requestBody, getAxiosConfig())
       .then((response) => {
         console.log("BM account created successfully:", response.data);
         setShowConfirmationModal(false);
