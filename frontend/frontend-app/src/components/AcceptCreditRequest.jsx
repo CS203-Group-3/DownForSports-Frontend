@@ -3,6 +3,7 @@ import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { Card, Button, Modal, Form } from 'react-bootstrap';
+import { getAxiosConfig } from './Headers';
 
 function AcceptCreditRequest() {
   const [creditRequests, setCreditRequests] = useState([]);
@@ -14,7 +15,7 @@ function AcceptCreditRequest() {
 
   useEffect(() => {
     // Make an API call to fetch credit requests data when the component mounts
-    axios.get("http://localhost:8080/api/bookings/creditrequest")
+    axios.get("http://localhost:8080/api/bookings/creditrequest", getAxiosConfig())
       .then((response) => {
         setCreditRequests(response.data);
       })

@@ -3,6 +3,7 @@ import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { Card, Button, Modal, Form } from 'react-bootstrap';
+import { getAxiosConfig } from './Headers';
 
 function PastBookings() {
   const [pastBookings, setPastBookings] = useState([]);
@@ -22,7 +23,11 @@ function PastBookings() {
         params: {
           userId: userId,
         },
-      })
+        headers: {
+          Authorization: JSON.parse(localStorage.getItem('jwtResponse')).accessToken,
+          withCredentials: true,
+        },
+      }, )
       .then((response) => {
         console.log("View response: ", response.data);
         setPastBookings(response.data);
@@ -49,7 +54,7 @@ function PastBookings() {
     };
 
     axios
-      .post("http://localhost:8080/api/bookings/creditrequest", creditRequestData)
+      .post("http://localhost:8080/api/bookings/creditrequest", creditRequestData, getAxiosConfig() )
       .then((response) => {
         console.log("Credit request created:", response.data);
         setConfirmationMessage("Request sent successfully");

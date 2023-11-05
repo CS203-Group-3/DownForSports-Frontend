@@ -38,7 +38,7 @@ function ConfirmAttendance() {
     axios.post('http://localhost:8080/api/bookings/confirmbookingattendance', {
       bookingId: bookingId,
       attendanceStatus: attendanceStatus
-    })
+    }, getAxiosConfig())
     .then((response) => {
       console.log('Attendance confirmed successfully.');
       handleCloseModal();

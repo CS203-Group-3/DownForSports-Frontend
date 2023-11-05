@@ -3,6 +3,7 @@ import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { Card, Button, Modal, Alert } from 'react-bootstrap';
+import { getAxiosConfig } from './Headers';
 
 function UpcomingBookings() {
   const [upcomingBookings, setUpcomingBookings] = useState([]);
@@ -16,6 +17,10 @@ function UpcomingBookings() {
       .get("http://localhost:8080/api/bookings/viewupcomingbookings", {
         params: {
           userId: userId,
+        },
+        headers: {
+          Authorization: JSON.parse(localStorage.getItem('jwtResponse')).accessToken,
+          withCredentials: true,
         },
       })
       .then((response) => {
@@ -42,7 +47,7 @@ function UpcomingBookings() {
     if (bookingToCancel) {
       console.log('Canceling booking with bookingId:', bookingToCancel.bookingId); // Log the bookingId
       axios
-        .post("http://localhost:8080/api/bookings/cancelbooking", { bookingId: bookingToCancel.bookingId })
+        .post("http://localhost:8080/api/bookings/cancelbooking", { bookingId: bookingToCancel.bookingId }, getAxiosConfig())
         .then((response) => {
           console.log("Booking canceled:", response.data);
           // Handle success and display a confirmation message
@@ -53,6 +58,10 @@ function UpcomingBookings() {
             .get("http://localhost:8080/api/bookings/viewupcomingbookings", {
               params: {
                 userId: userId,
+              },
+              headers: {
+                Authorization: JSON.parse(localStorage.getItem('jwtResponse')).accessToken,
+                withCredentials: true,
               },
             })
             .then((refreshedData) => {

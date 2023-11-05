@@ -205,7 +205,7 @@ function FacilityList() {
         console.log("Facility deleted:", response.data);
         // Refresh the list of facilities after deletion
         axios
-          .get("http://localhost:8080/api/facilities")
+          .get("http://localhost:8080/api/facilities", getAxiosConfig())
           .then((response) => {
             setFacilities(response.data);
           })

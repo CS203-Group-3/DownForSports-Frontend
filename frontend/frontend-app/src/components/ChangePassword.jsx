@@ -3,6 +3,7 @@ import axios from 'axios';
 import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { getAxiosConfig } from './Headers';
 
 function ChangePassword() {
   const [oldPassword, setOldPassword] = useState('');
@@ -54,7 +55,7 @@ function ChangePassword() {
       const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
       // Retrieve the user's ID or userID from your front-end
       const userId = JSON.parse(localStorage.getItem('jwtResponse')).id; // Replace with your logic to get the user's ID
-      axios.delete(`http://localhost:8080/api/user/logout/${userId}`)
+      axios.delete(`http://localhost:8080/api/user/logout/${userId}`, getAxiosConfig())
         .then((response) => {
           // Handle successful logout, e.g., clear user data in the front-end
           localStorage.removeItem('jwtResponse');
