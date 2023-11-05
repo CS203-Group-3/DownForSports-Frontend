@@ -3,6 +3,7 @@ import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { Tabs, Tab, Card, Button, Modal } from 'react-bootstrap'; // Import Tabs and Tab from React-Bootstrap
+import { getAxiosConfig } from './Headers';
 
 function ConfirmAttendance() {
   const [bookings, setBookings] = useState([]);
@@ -13,7 +14,7 @@ function ConfirmAttendance() {
 
   useEffect(() => {
     // Fetch all bookings from the API
-    axios.get('http://localhost:8080/api/bookings/')
+    axios.get('http://localhost:8080/api/bookings/', getAxiosConfig())
       .then((response) => {
         setBookings(response.data);
         setLoading(false);

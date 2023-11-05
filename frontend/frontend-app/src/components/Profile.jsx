@@ -3,6 +3,7 @@ import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { getAxiosConfig } from './Headers';
 
 function Profile() {
   const [profileData, setProfileData] = useState(null);
@@ -27,13 +28,8 @@ function Profile() {
       // console.log(jwtResponse.accessToken)
 
       const userId = jwtResponse.id;
-      axios.get(`http://localhost:8080/api/user/details/${userId}`,
-          { headers:
-                {
-                  Authorization : jwtResponse.accessToken,
-                  withCredentials:true
-                }
-          }) .then(res => {
+      axios.get(`http://localhost:8080/api/user/details/${userId}`, getAxiosConfig())
+            .then(res => {
             const profile = {
               username: res.data.username,
               email: res.data.email,
