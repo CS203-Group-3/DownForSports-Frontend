@@ -11,16 +11,16 @@ function UpcomingBookings() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [bookingToCancel, setBookingToCancel] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [refundAmount, setRefundAmount] = useState(null); // New state for refund amount
   const today = new Date().toISOString().split('T')[0];
   const navigate = useNavigate();
   const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
 
   useEffect(() => {
-    
     if (!jwtResponse || !jwtResponse.accessToken) {
       navigate('/login');
       return;
-    } 
+    }
     const userId = jwtResponse.id;
     axios
       .get("http://localhost:8080/api/bookings/viewupcomingbookings", {
@@ -28,16 +28,14 @@ function UpcomingBookings() {
           userId: userId,
         },
         headers: {
-          Authorization: JSON.parse(localStorage.getItem('jwtResponse')).accessToken,
+          Authorization: jwtResponse.accessToken,
           withCredentials: true,
         },
       })
       .then((response) => {
         console.log("View response: ", response.data);
 
-        // Sort the bookings by date and time in ascending order
         const sortedBookings = response.data.sort((a, b) => {
-          // Parse dates and times and compare
           const dateTimeA = new Date(a.date + ' ' + a.startTime);
           const dateTimeB = new Date(b.date + ' ' + b.startTime);
           return dateTimeA - dateTimeB;
@@ -48,41 +46,58 @@ function UpcomingBookings() {
       .catch((error) => {
         console.error('Error fetching upcoming bookings:', error);
       });
-  }, [navigate]);
+  }, [navigate, jwtResponse]);
 
   const openCancelModal = (booking) => {
     setBookingToCancel(booking);
+
+    // Calculate refund amount here based on the difference in days between today and the chosen booking
+    const dateBooked = new Date(booking.date);
+    const currentDate = new Date();
+    dateBooked.setHours(0, 0, 0, 0); // Set time to midnight
+    currentDate.setHours(0, 0, 0, 0); // Set time to midnight
+    const daysDifference = Math.floor((dateBooked - currentDate) / (1000 * 60 * 60 * 24));
+    let refundAmount = 0;
+    if (daysDifference >= 6) {
+      refundAmount = booking.creditDeducted; // 100% refund
+    } else if (daysDifference === 5) {
+      refundAmount = booking.creditDeducted * 0.8; // 80% refund
+    } else if (daysDifference >= 3 && daysDifference <= 4) {
+      refundAmount = booking.creditDeducted * 0.5; // 50% refund
+    }
+
+    // Set the calculated refund amount
+    setRefundAmount(refundAmount);
+    console.log(`Days difference: ${daysDifference}`);
+    console.log(`Refund amount: ${refundAmount}`);
     setShowCancelModal(true);
   };
 
   const closeCancelModal = () => {
     setShowCancelModal(false);
     setBookingToCancel(null);
+    setRefundAmount(null); // Reset refund amount
   };
 
   const confirmCancelBooking = () => {
     if (bookingToCancel) {
-      console.log('Canceling booking with bookingId:', bookingToCancel.bookingId); // Log the bookingId
+      console.log('Canceling booking with bookingId:', bookingToCancel.bookingId);
       axios
         .post("http://localhost:8080/api/bookings/cancelbooking", { bookingId: bookingToCancel.bookingId }, getAxiosConfig())
         .then((response) => {
           console.log("Booking canceled:", response.data);
-          // Handle success and display a confirmation message
           setSuccessMessage("Booking deleted successfully");
-          // You can also refresh the list of upcoming bookings
-          // Refresh the list of upcoming bookings
           axios
             .get("http://localhost:8080/api/bookings/viewupcomingbookings", {
               params: {
                 userId: jwtResponse.id,
               },
               headers: {
-                Authorization: JSON.parse(localStorage.getItem('jwtResponse')).accessToken,
+                Authorization: jwtResponse.accessToken,
                 withCredentials: true,
               },
             })
             .then((refreshedData) => {
-              // Sort the refreshed bookings
               const sortedBookings = refreshedData.data.sort((a, b) => {
                 const dateTimeA = new Date(a.date + ' ' + a.startTime);
                 const dateTimeB = new Date(b.date + ' ' + b.startTime);
@@ -98,16 +113,12 @@ function UpcomingBookings() {
         })
         .catch((error) => {
           console.error('Error canceling booking:', error);
-          // Handle the error and display an error message
           closeCancelModal();
         });
     }
   };
 
-  // Filter today's bookings
   const todayBookings = upcomingBookings.filter((booking) => booking.date === today);
-
-  // Filter upcoming bookings (exclude today's bookings)
   const futureBookings = upcomingBookings.filter((booking) => booking.date > today);
 
   return (
@@ -180,7 +191,11 @@ function UpcomingBookings() {
           <Modal.Title>Confirm Cancellation</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to cancel this booking?
+          {refundAmount !== null && (
+            <p>
+              Are you sure you want to cancel this booking? You will be refunded {refundAmount} credits.
+            </p>
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={closeCancelModal}>

@@ -51,7 +51,7 @@ function PastBookings() {
       .catch((error) => {
         console.error('Error fetching past bookings:', error);
       });
-  }, [navigate]);
+  }, [navigate, jwtResponse]);
 
   const openModal = (bookingId) => {
     setBookingIdForCreditAppeal(bookingId); // Set the bookingId for credit appeal
