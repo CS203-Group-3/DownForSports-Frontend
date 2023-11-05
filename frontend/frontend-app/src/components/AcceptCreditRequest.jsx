@@ -11,6 +11,8 @@ function AcceptCreditRequest() {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false); // State variable for success message
   const [showErrorMessage, setShowErrorMessage] = useState(false); // State variable for error message
   const [amount, setAmount] = useState(0);
+  const [creditID, setcreditID] = useState(0);
+  const [userID, setUserID] = useState(0);
 
   useEffect(() => {
     // Make an API call to fetch credit requests data when the component mounts
@@ -23,9 +25,14 @@ function AcceptCreditRequest() {
       });
   }, []);
 
-  const openModal = (amount) => {
+  const openModal = (amount, creditID, userID) => {
     setAmount(amount);
+    setcreditID(creditID);
     setShowModal(true);
+    setUserID(userID);
+    console.log(userID);
+    console.log(creditID);
+
   };
 
   const closeModal = () => {
@@ -35,16 +42,20 @@ function AcceptCreditRequest() {
   const handleConfirmAction = (action) => {
     if (action === 'Accept') {
       // Handle the Accept action
+      console.log(creditID);
+      console.log(userID);
       axios
         .post("http://localhost:8080/api/bookings/creditrequest/confirm",
         {
-          userID: JSON.parse(localStorage.getItem('jwtResponse')).id,
-          refundAmount: amount
-        }, 
+          userID: userID,
+          amount: amount,
+          creditRequestID: creditID
+        },
         {
           headers: {
             Authorization : JSON.parse(localStorage.getItem('jwtResponse')).accessToken,
             withCredentials: true,
+            'Content-Type': 'application/json',
           },
         }
         )
@@ -122,7 +133,7 @@ function AcceptCreditRequest() {
                   <strong>Location:</strong> {creditRequest.bookingResponse.location}
                   <br />
                 </Card.Text>
-                <Button variant="primary" onClick={() => openModal(creditRequest.amount)}>
+                <Button variant="primary" onClick={() => openModal(creditRequest.amount, creditRequest.creditID, creditRequest.userID)}>
                   Confirm
                 </Button>
               </Card.Body>
