@@ -4,6 +4,7 @@ import MyNavbar from "./NavbarComp";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Modal, Button, ListGroup, Card } from "react-bootstrap";
 import { getAxiosConfig } from "./Headers";
+import { useNavigate } from 'react-router-dom';
 
 function FacilityList() {
   const [facilities, setFacilities] = useState([]);
@@ -24,6 +25,7 @@ function FacilityList() {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [facilityToDelete, setFacilityToDelete] = useState(null);
   const [loading, setLoading] = useState(false); // Add the loading state
+  const navigate = useNavigate();
 
   useEffect(() => {
     const jwtResponse = JSON.parse(localStorage.getItem("jwtResponse"));
@@ -38,8 +40,9 @@ function FacilityList() {
       })
       .catch((error) => {
         console.error("Error fetching facilities:", error);
+        navigate('/login');
       });
-  }, []);
+  }, [navigate]);
 
   const fetchDates = (facility) => {
     axios

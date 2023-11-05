@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { Tabs, Tab, Card, Button, Modal } from 'react-bootstrap'; // Import Tabs and Tab from React-Bootstrap
 import { getAxiosConfig } from './Headers';
+import withRoleAuthorization from './RoleAuthorization';
 
 function ConfirmAttendance() {
   const [bookings, setBookings] = useState([]);
@@ -150,4 +151,4 @@ function ConfirmAttendance() {
   );
 }
 
-export default ConfirmAttendance;
+export default withRoleAuthorization(['ROLE_BOOKINGMANAGER'])(ConfirmAttendance);
