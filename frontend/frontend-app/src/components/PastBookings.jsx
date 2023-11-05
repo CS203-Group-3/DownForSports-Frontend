@@ -27,10 +27,19 @@ function PastBookings() {
           Authorization: JSON.parse(localStorage.getItem('jwtResponse')).accessToken,
           withCredentials: true,
         },
-      }, )
+      })
       .then((response) => {
         console.log("View response: ", response.data);
-        setPastBookings(response.data);
+
+        // Sort the past bookings by date and time in descending order
+        const sortedBookings = response.data.sort((a, b) => {
+          // Parse dates and times and compare in reverse order
+          const dateTimeA = new Date(a.date + ' ' + a.startTime);
+          const dateTimeB = new Date(b.date + ' ' + b.startTime);
+          return dateTimeB - dateTimeA;
+        });
+
+        setPastBookings(sortedBookings);
       })
       .catch((error) => {
         console.error('Error fetching past bookings:', error);
