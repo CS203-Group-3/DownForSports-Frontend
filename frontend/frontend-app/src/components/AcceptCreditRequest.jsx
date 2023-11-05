@@ -4,8 +4,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { Card, Button, Modal, Form, Alert } from 'react-bootstrap'; // Import Alert component
 import { getAxiosConfig } from './Headers';
-import { useNavigate } from 'react-router-dom';
-import withRoleAuthorization from './RoleAuthorization';
 
 function AcceptCreditRequest() {
   const [creditRequests, setCreditRequests] = useState([]);
@@ -15,7 +13,6 @@ function AcceptCreditRequest() {
   const [amount, setAmount] = useState(0);
   const [creditID, setcreditID] = useState(0);
   const [userID, setUserID] = useState(0);
-  const [navigate] = useNavigate();
 
   useEffect(() => {
     // Make an API call to fetch credit requests data when the component mounts
@@ -25,9 +22,8 @@ function AcceptCreditRequest() {
       })
       .catch((error) => {
         console.error('Error fetching credit requests:', error);
-        navigate('/login');
       });
-  }, [navigate]);
+  }, []);
 
   const openModal = (amount, creditID, userID) => {
     setAmount(amount);
@@ -169,7 +165,10 @@ function AcceptCreditRequest() {
           <Button variant="secondary" onClick={closeModal}>
             Go Back
           </Button>
-          <Button variant="success" onClick={handleConfirmAction}>
+          <Button variant="danger" onClick={() => handleConfirmAction("Decline")}>
+            Decline
+          </Button>
+          <Button variant="success" onClick={() => handleConfirmAction("Accept")}>
             Accept
           </Button>
         </Modal.Footer>
@@ -178,5 +177,4 @@ function AcceptCreditRequest() {
   );
 }
 
-export default withRoleAuthorization(['ROLE_BOOKINGMANAGER'])(AcceptCreditRequest);
-
+export default AcceptCreditRequest;
