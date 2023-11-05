@@ -121,10 +121,14 @@ function FacilityList() {
         setSelectedTimeslotIds(selectedTimeslotIds.filter((id) => id !== timeslot.timeslotId));
       }
     } else {
-      setSelectedTimeslots([...selectedTimeslots, timeslot]);
+      const updatedTimeslots = [...selectedTimeslots, timeslot];
+      updatedTimeslots.sort((a, b) => a.time.localeCompare(b.time));
+  
+      setSelectedTimeslots(updatedTimeslots);
       setSelectedTimeslotIds([...selectedTimeslotIds, timeslot.timeslotId]);
     }
   };
+  
 
   const booking = () => {
     if (selectedFacility && selectedDateId && selectedTimeslotIds.length > 0) {

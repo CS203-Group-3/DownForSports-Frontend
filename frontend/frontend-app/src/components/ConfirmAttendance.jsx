@@ -7,7 +7,6 @@ import { getAxiosConfig } from './Headers';
 
 function ConfirmAttendance() {
   const [bookings, setBookings] = useState([]);
-
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [bookingId, setBookingId] = useState(null);
@@ -57,6 +56,16 @@ function ConfirmAttendance() {
 
   // Filter upcoming bookings (exclude today's bookings)
   const upcomingBookings = bookings.filter((booking) => booking.date > today && !todayBookings.includes(booking));
+
+  if (loading) {
+    // Return a loading indicator while data is being fetched
+    return (
+      <div>
+        <MyNavbar />
+        <h1>Loading...</h1>
+      </div>
+    );
+  }
 
   return (
     <div>

@@ -99,7 +99,8 @@ function PastBookings() {
                   <br />
                   <strong>Location:</strong> {booking.location}
                   <br />
-                  {booking.bookingAttended === false ? (
+
+                  {booking.bookingAttended === false && booking.bookingAttendanceChecked === true ? (
                     sentCreditRequests.includes(booking.bookingId) ? (
                       <span>Request sent</span>
                     ) : (

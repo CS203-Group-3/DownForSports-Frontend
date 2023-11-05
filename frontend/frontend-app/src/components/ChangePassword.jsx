@@ -52,7 +52,6 @@ function ChangePassword() {
 
     // Logout function to remove the JWT token from localStorage
     function logout() {
-      const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
       // Retrieve the user's ID or userID from your front-end
       const userId = JSON.parse(localStorage.getItem('jwtResponse')).id; // Replace with your logic to get the user's ID
       axios.delete(`http://localhost:8080/api/user/logout/${userId}`, getAxiosConfig())

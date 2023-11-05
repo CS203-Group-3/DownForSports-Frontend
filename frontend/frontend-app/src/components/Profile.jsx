@@ -8,19 +8,6 @@ import { getAxiosConfig } from './Headers';
 function Profile() {
   const [profileData, setProfileData] = useState(null);
 
-  // useEffect(() => {
-  //   // Hardcoded profile data
-  //   const profile = {
-  //     username: 'Hirai Momo',
-  //     email: 'Momo@Twice.com',
-  //     creditScore: 269,
-  //     profilePictureUrl:
-  //       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvQOzLVWtuIaOlLcxtYyFdnQVDUHcGKTaCRQ&usqp=CAU',
-  //   };
-
-  //   setProfileData(profile);
-  // }, []);
-
     // Retrieve the jwtResponse from localStorage
     useEffect(() => {
       const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));

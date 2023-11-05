@@ -1,4 +1,4 @@
-import axios from 'axios';
+
 
 export const getAxiosConfig = () => {
     const jwtResponse = JSON.parse(localStorage.getItem("jwtResponse"));
