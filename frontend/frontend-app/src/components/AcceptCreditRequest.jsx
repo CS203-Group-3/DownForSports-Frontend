@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Card, Button, Modal, Form, Alert } from 'react-bootstrap'; // Import Alert component
 import { getAxiosConfig } from './Headers';
 import { useNavigate } from 'react-router-dom';
+import withRoleAuthorization from './RoleAuthorization';
 
 function AcceptCreditRequest() {
   const [creditRequests, setCreditRequests] = useState([]);
@@ -146,4 +147,5 @@ function AcceptCreditRequest() {
   );
 }
 
-export default AcceptCreditRequest;
+export default withRoleAuthorization(['ROLE_BOOKINGMANAGER'])(AcceptCreditRequest);
+
