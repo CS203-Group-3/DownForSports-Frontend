@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { Card, Button, Modal, Form } from 'react-bootstrap';
 import { getAxiosConfig } from './Headers';
+import { useNavigate } from 'react-router-dom';
 
 function PastBookings() {
   const [pastBookings, setPastBookings] = useState([]);
@@ -14,10 +15,16 @@ function PastBookings() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState('');
   const [bookingIdForCreditAppeal, setBookingIdForCreditAppeal] = useState(null);
-
-  const userId = JSON.parse(localStorage.getItem('jwtResponse')).id;
+  const navigate = useNavigate();
+  const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
 
   useEffect(() => {
+    if (!jwtResponse || !jwtResponse.accessToken) {
+      navigate('/login');
+      return;
+    } 
+
+    const userId = jwtResponse.id;
     axios
       .get("http://localhost:8080/api/bookings/viewpastbookings", {
         params: {
@@ -44,7 +51,7 @@ function PastBookings() {
       .catch((error) => {
         console.error('Error fetching past bookings:', error);
       });
-  }, [userId]);
+  }, [navigate]);
 
   const openModal = (bookingId) => {
     setBookingIdForCreditAppeal(bookingId); // Set the bookingId for credit appeal

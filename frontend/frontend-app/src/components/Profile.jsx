@@ -4,13 +4,20 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { getAxiosConfig } from './Headers';
+import { useNavigate } from 'react-router-dom';
 
 function Profile() {
   const [profileData, setProfileData] = useState(null);
+  const navigate = useNavigate();
 
     // Retrieve the jwtResponse from localStorage
     useEffect(() => {
-      const userId = JSON.parse(localStorage.getItem('jwtResponse')).id;
+      const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
+      if (!jwtResponse || !jwtResponse.accessToken) {
+        navigate('/login');
+        return;
+      } 
+      const userId = jwtResponse.id;
       axios.get(`http://localhost:8080/api/user/details/${userId}`, getAxiosConfig())
             .then(res => {
             const profile = {
@@ -26,7 +33,7 @@ function Profile() {
             console.error('Error fetching profile data:', error);
           });
       
-      }, []);
+      }, [navigate]);
 
     // Check if jwtResponse is available
 

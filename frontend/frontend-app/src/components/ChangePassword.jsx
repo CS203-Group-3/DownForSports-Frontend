@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -12,6 +12,16 @@ function ChangePassword() {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const navigate = useNavigate(); // Get the navigate function
+
+  useEffect(() => {
+    // Check if jwtToken is available in localStorage
+    const jwtToken = localStorage.getItem('jwtToken');
+
+    if (!jwtToken) {
+      // If jwtToken is not available, navigate to the login page
+      navigate('/login');
+    }
+  }, [navigate]);
 
   const handleChangePassword = () => {
     setError(null);

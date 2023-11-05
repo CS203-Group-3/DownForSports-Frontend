@@ -5,14 +5,21 @@ import axios from 'axios';
 import { Tabs, Tab, Card, Button, Modal } from 'react-bootstrap'; // Import Tabs and Tab from React-Bootstrap
 import { getAxiosConfig } from './Headers';
 import withRoleAuthorization from './RoleAuthorization';
+import { useNavigate } from 'react-router-dom';
 
 function ConfirmAttendance() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [bookingId, setBookingId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
+    if (!jwtResponse || !jwtResponse.accessToken) {
+      navigate('/login');
+      return;
+    } 
     // Fetch all bookings from the API
     axios.get('http://localhost:8080/api/bookings/', getAxiosConfig())
       .then((response) => {
@@ -23,7 +30,7 @@ function ConfirmAttendance() {
         console.error('Error fetching bookings:', error);
         setLoading(false);
       });
-  }, []);
+  }, [navigate]);
 
   const handleOpenModal = (id) => {
     setBookingId(id);

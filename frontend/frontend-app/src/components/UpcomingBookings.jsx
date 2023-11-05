@@ -4,16 +4,24 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { Card, Button, Modal, Alert, Tabs, Tab } from 'react-bootstrap';
 import { getAxiosConfig } from './Headers';
+import { useNavigate } from 'react-router-dom';
 
 function UpcomingBookings() {
   const [upcomingBookings, setUpcomingBookings] = useState([]);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [bookingToCancel, setBookingToCancel] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
-  const userId = JSON.parse(localStorage.getItem('jwtResponse')).id;
   const today = new Date().toISOString().split('T')[0];
+  const navigate = useNavigate();
+  const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
 
   useEffect(() => {
+    
+    if (!jwtResponse || !jwtResponse.accessToken) {
+      navigate('/login');
+      return;
+    } 
+    const userId = jwtResponse.id;
     axios
       .get("http://localhost:8080/api/bookings/viewupcomingbookings", {
         params: {
@@ -40,7 +48,7 @@ function UpcomingBookings() {
       .catch((error) => {
         console.error('Error fetching upcoming bookings:', error);
       });
-  }, [userId]);
+  }, [navigate]);
 
   const openCancelModal = (booking) => {
     setBookingToCancel(booking);
@@ -66,7 +74,7 @@ function UpcomingBookings() {
           axios
             .get("http://localhost:8080/api/bookings/viewupcomingbookings", {
               params: {
-                userId: userId,
+                userId: jwtResponse.id,
               },
               headers: {
                 Authorization: JSON.parse(localStorage.getItem('jwtResponse')).accessToken,

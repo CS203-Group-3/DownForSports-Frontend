@@ -6,13 +6,28 @@ const withRoleAuthorization = (allowedRoles) => (WrappedComponent) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-      // Retrieve user roles from local storage
-      const userRoles = JSON.parse(localStorage.getItem('jwtResponse')).roles;
+      // Check if jwtToken is available in localStorage
+      const jwtToken = localStorage.getItem('jwtToken');
 
-      if (!userRoles.some((role) => allowedRoles.includes(role))) {
+      if (!jwtToken) {
+        // If jwtToken is not available, navigate to the login page
+        navigate('/login');
+        return; // Stop further processing
+      }
+
+      // Retrieve user roles from local storage
+      try {
+        const userRoles = JSON.parse(jwtToken).roles;
+
+        if (!userRoles.some((role) => allowedRoles.includes(role))) {
+          navigate('/home');
+        }
+      } catch (error) {
+        // Handle potential JSON parsing errors
+        console.error('Error parsing user roles:', error);
         navigate('/home');
       }
-    }, [navigate]); // No need to include props in the dependency array
+    }, [navigate, allowedRoles]);
 
     return <WrappedComponent {...props} />;
   };

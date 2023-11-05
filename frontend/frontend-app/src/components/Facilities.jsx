@@ -28,7 +28,12 @@ function FacilityList() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const jwtResponse = JSON.parse(localStorage.getItem("jwtResponse"));
+    const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
+    if (!jwtResponse || !jwtResponse.accessToken) {
+      navigate('/login');
+      return;
+    } 
+
     if (jwtResponse && jwtResponse.roles) {
       setUserRoles(jwtResponse.roles);
     }
