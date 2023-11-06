@@ -13,8 +13,9 @@ function Register() {
   const [otp, setOtp] = useState("");
   const [otpVerified, setOtpVerified] = useState(false);
   const navigate = useNavigate();
-  const [jwtResponse, setJwtResponse] = useState(null);
   const [userID, setUserID] = useState("");
+  const [otpVerificationError, setOtpVerificationError] = useState("");
+
 
   async function save(event) {
     event.preventDefault();
@@ -63,56 +64,59 @@ function Register() {
   
   async function verifyOtp() {
     try {
-      console.log(userID);
-      console.log(otp);
-      const verified = await axios.post("http://localhost:8080/api/otp/validateOtp", {
+      const otpResponse = await axios.post("http://localhost:8080/api/otp/validateOtp", {
         userId: userID,
         oneTimePasswordCode: otp,
       });
   
-      setOtpVerified(true);
-      setShowOtpModal(false);
-  
-      if (otpVerified) {
-        try {
-          // Only attempt auto-login if OTP is verified
-          await axios.post("http://localhost:8080/api/auth/login", {
-            username: username,
-            password: password,
-          }).then((response) => {
-            const jwtResponse = {
-              accessToken: "Bearer " + response.data.accessToken,
-              id: response.data.id,
-              username: response.data.username,
-              email: response.data.email,
-              roles: response.data.roles,
-            };
-            localStorage.setItem('jwtResponse', JSON.stringify(jwtResponse));
-            console.log('accessToken:', jwtResponse.accessToken);
-            console.log('Username:', jwtResponse.username);
-            console.log('Role:', jwtResponse.roles);
-            alert("Login Successful");
-            navigate("/home");
-          });
-          navigate("/home");
-        } catch (error) {
-          if (error.response && error.response.status === 400) {
-            const errorMessage = error.response.data.message;
-            alert("Auto Login Failed: " + errorMessage);
-          } else {
-            console.error("Auto Login Error:", error.message);
-          }
-        }
+      if (otpResponse.status === 200) { // Check the HTTP status code
+        setOtpVerified(true);
+        setOtpVerificationError(""); // Reset OTP verification error
+        await autoLogin();
+      } else {
+        setOtpVerificationError("Wrong OTP, please try again");
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        const errorMessage = error.response.data.message;
-        alert("OTP Verification Failed: " + errorMessage);
+        const errorMessage = error.response.data;
+        setOtpVerificationError(errorMessage);
       } else {
         console.error("OTP Verification Error:", error.message);
       }
     }
   }
+  
+  async function autoLogin() {
+    try {
+      const loginResponse = await axios.post("http://localhost:8080/api/auth/login", {
+        username: username,
+        password: password,
+      });
+  
+      const jwtResponse = {
+        accessToken: "Bearer " + loginResponse.data.accessToken,
+        id: loginResponse.data.id,
+        username: loginResponse.data.username,
+        email: loginResponse.data.email,
+        roles: loginResponse.data.roles,
+      };
+  
+      localStorage.setItem('jwtResponse', JSON.stringify(jwtResponse));
+      console.log('accessToken:', jwtResponse.accessToken);
+      console.log('Username:', jwtResponse.username);
+      console.log('Role:', jwtResponse.roles);
+      alert("Login Successful");
+      navigate("/home");
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        const errorMessage = error.response.data.message;
+        alert("Auto Login Failed: " + errorMessage);
+      } else {
+        console.error("Auto Login Error:", error.message);
+      }
+    }
+  }
+  
   
 
   return (
@@ -197,6 +201,11 @@ function Register() {
               onChange={handleOtpChange}
             />
           </Form.Group>
+          {otpVerificationError && (
+            <div className="text-danger">
+              {otpVerificationError}
+            </div>
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowOtpModal(false)}>
