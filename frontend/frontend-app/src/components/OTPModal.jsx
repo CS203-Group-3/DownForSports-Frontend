@@ -8,6 +8,7 @@ function OTPModal(props) {
   const [show, setShow] = useState(false);
   const [otpValue, setOtpValue] = useState("");
   const [validationResult, setValidationResult] = useState(null);
+  const navigate = useNavigate();
   const handleClose = () => setShow(false);
   const handleShow = () => {
     // Call the save function when the "Register" button is clicked
