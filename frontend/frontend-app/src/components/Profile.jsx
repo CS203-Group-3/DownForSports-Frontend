@@ -18,7 +18,7 @@ function Profile() {
         return;
       } 
       const userId = jwtResponse.id;
-      axios.get(`http://localhost:8080/api/user/details/${userId}`, getAxiosConfig())
+      axios.get(`http://18.141.196.51:8080/api/user/details/${userId}`, getAxiosConfig())
             .then(res => {
             const profile = {
               username: res.data.username,

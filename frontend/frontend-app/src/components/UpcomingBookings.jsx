@@ -23,7 +23,7 @@ function UpcomingBookings() {
     }
     const userId = jwtResponse.id;
     axios
-      .get("http://localhost:8080/api/bookings/viewupcomingbookings", {
+      .get("http://18.141.196.51:8080/api/bookings/viewupcomingbookings", {
         params: {
           userId: userId,
         },
@@ -83,12 +83,12 @@ function UpcomingBookings() {
     if (bookingToCancel) {
       console.log('Canceling booking with bookingId:', bookingToCancel.bookingId);
       axios
-        .post("http://localhost:8080/api/bookings/cancelbooking", { bookingId: bookingToCancel.bookingId }, getAxiosConfig())
+        .post("http://18.141.196.51:8080/api/bookings/cancelbooking", { bookingId: bookingToCancel.bookingId }, getAxiosConfig())
         .then((response) => {
           console.log("Booking canceled:", response.data);
           setSuccessMessage("Booking deleted successfully");
           axios
-            .get("http://localhost:8080/api/bookings/viewupcomingbookings", {
+            .get("http://18.141.196.51:8080/api/bookings/viewupcomingbookings", {
               params: {
                 userId: jwtResponse.id,
               },

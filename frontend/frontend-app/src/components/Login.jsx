@@ -13,7 +13,7 @@ function Login() {
     async function login(event) {
       event.preventDefault();
       try {
-        await axios.post("http://localhost:8080/api/auth/login", {
+        await axios.post("http://18.141.196.51:8080/api/auth/login", {
           username: username,
           password: password,
         }).then((response) => {
