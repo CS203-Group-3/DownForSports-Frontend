@@ -27,7 +27,7 @@ function Register() {
   
     try {
       // Register the user
-      const response = await axios.post("http://18.141.196.51:8080/api/auth/register", {
+      const response = await axios.post("http://localhost:8080/api/auth/register", {
         username: username,
         email: email,
         password: password,
@@ -65,7 +65,7 @@ function Register() {
   
   async function verifyOtp() {
     try {
-      const otpResponse = await axios.post("http://18.141.196.51:8080/api/otp/validateOtp", {
+      const otpResponse = await axios.post("http://localhost:8080/api/otp/validateOtp", {
         userId: userID,
         oneTimePasswordCode: otp,
       });
@@ -89,7 +89,7 @@ function Register() {
   
   async function autoLogin() {
     try {
-      const loginResponse = await axios.post("http://18.141.196.51:8080/api/auth/login", {
+      const loginResponse = await axios.post("http://localhost:8080/api/auth/login", {
         username: username,
         password: password,
       });

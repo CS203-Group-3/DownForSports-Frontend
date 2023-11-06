@@ -26,7 +26,7 @@ function PastBookings() {
 
     const userId = jwtResponse.id;
     axios
-      .get("http://18.141.196.51:8080/api/bookings/viewpastbookings", {
+      .get("http://localhost:8080/api/bookings/viewpastbookings", {
         params: {
           userId: userId,
         },
@@ -70,7 +70,7 @@ function PastBookings() {
     };
 
     axios
-      .post("http://18.141.196.51:8080/api/bookings/creditrequest", creditRequestData, getAxiosConfig() )
+      .post("http://localhost:8080/api/bookings/creditrequest", creditRequestData, getAxiosConfig() )
       .then((response) => {
         console.log("Credit request created:", response.data);
         setConfirmationMessage("Request sent successfully");

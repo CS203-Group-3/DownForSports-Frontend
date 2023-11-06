@@ -53,7 +53,7 @@ function CreateBM() {
   
     // Send a POST request to create the BM account
     axios
-      .post("http://18.141.196.51:8080/api/auth/registerBM", requestBody, getAxiosConfig())
+      .post("http://localhost:8080/api/auth/registerBM", requestBody, getAxiosConfig())
       .then((response) => {
         console.log("BM account created successfully:", response.data);
         setShowConfirmationModal(false);

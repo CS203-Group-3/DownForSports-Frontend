@@ -26,7 +26,7 @@ function CreateFacilityForm() {
       };
 
       // Send a POST request to create a facility with headers
-      await axios.post("http://18.141.196.51:8080/api/facilities", {
+      await axios.post("http://localhost:8080/api/facilities", {
         facilityType: facilityType,
         description: description,
         openTime: openTime,

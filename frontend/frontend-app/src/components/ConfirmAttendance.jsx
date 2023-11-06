@@ -21,7 +21,7 @@ function ConfirmAttendance() {
       return;
     } 
     // Fetch all bookings from the API
-    axios.get('http://18.141.196.51:8080/api/bookings/', getAxiosConfig())
+    axios.get('http://localhost:8080/api/bookings/', getAxiosConfig())
       .then((response) => {
         setBookings(response.data);
         setLoading(false);
@@ -42,7 +42,7 @@ function ConfirmAttendance() {
   };
 
   const handleConfirmAttendance = (attendanceStatus) => {
-    axios.post('http://18.141.196.51:8080/api/bookings/confirmbookingattendance', {
+    axios.post('http://localhost:8080/api/bookings/confirmbookingattendance', {
       bookingId: bookingId,
       attendanceStatus: attendanceStatus
     }, getAxiosConfig())
