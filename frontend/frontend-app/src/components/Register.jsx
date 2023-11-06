@@ -14,6 +14,7 @@ function Register() {
   const [otpVerified, setOtpVerified] = useState(false);
   const navigate = useNavigate();
   const [jwtResponse, setJwtResponse] = useState(null);
+  const [userID, setUserID] = useState("");
 
   async function save(event) {
     event.preventDefault();
@@ -25,12 +26,14 @@ function Register() {
   
     try {
       // Register the user
-      await axios.post("http://localhost:8080/api/auth/register", {
+      const response = await axios.post("http://localhost:8080/api/auth/register", {
         username: username,
         email: email,
         password: password,
       });
   
+      setUserID(response.data.userID);
+      console.log(userID);
       alert("Registration Successful");
       setShowOtpModal(true);
     } catch (error) {
@@ -60,8 +63,10 @@ function Register() {
   
   async function verifyOtp() {
     try {
-      const otpResponse = await axios.post("http://localhost:8080/api/otp/validateOtp", {
-        userId: jwtResponse.id,
+      console.log(userID);
+      console.log(otp);
+      const verified = await axios.post("http://localhost:8080/api/otp/validateOtp", {
+        userId: userID,
         oneTimePasswordCode: otp,
       });
   
@@ -71,7 +76,7 @@ function Register() {
       if (otpVerified) {
         try {
           // Only attempt auto-login if OTP is verified
-          const loginResponse = await axios.post("http://localhost:8080/api/auth/login", {
+          await axios.post("http://localhost:8080/api/auth/login", {
             username: username,
             password: password,
           }).then((response) => {
