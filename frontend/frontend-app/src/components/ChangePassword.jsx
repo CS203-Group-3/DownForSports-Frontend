@@ -15,8 +15,7 @@ function ChangePassword() {
 
   useEffect(() => {
     // Check if jwtToken is available in localStorage
-    const jwtToken = localStorage.getItem('jwtToken');
-
+    const jwtToken = JSON.parse(localStorage.getItem('jwtResponse'));
     if (!jwtToken) {
       // If jwtToken is not available, navigate to the login page
       navigate('/login');

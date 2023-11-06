@@ -11,7 +11,7 @@ const HomePage = () => {
   
   useEffect(() => {
     // Check if the JWT token is present in localStorage
-    const jwtToken = localStorage.getItem('jwtResponse');
+    const jwtToken = JSON.parse(localStorage.getItem('jwtResponse'));
 
     // If not authenticated, reroute to the login page
     if (!jwtToken) {
