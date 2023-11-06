@@ -187,7 +187,7 @@ function Register() {
           <p className="mt-3">Already created an account? <a href="/login">Log in here</a></p>
         </div>
       </div>
-      <Modal show={showOtpModal} onHide={() => setShowOtpModal(false)}>
+      {/* <Modal show={showOtpModal} onHide={() => setShowOtpModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>OTP Verification</Modal.Title>
         </Modal.Header>
@@ -215,7 +215,7 @@ function Register() {
             Verify OTP
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
     </div>
   );
 }
