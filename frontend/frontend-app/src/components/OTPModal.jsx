@@ -45,7 +45,7 @@ function OTPModal(props) {
 
   // This is the save function
   const save = async () => {
-    if (password !== confirmPassword) {
+    if (props.password !== props.confirmPassword) {
       alert("Passwords do not match");
       return;
     }
