@@ -2,8 +2,6 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import axios from 'axios';
-import { getAxiosConfig } from './Headers';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -11,25 +9,12 @@ const HomePage = () => {
   
   useEffect(() => {
     // Check if the JWT token is present in localStorage
-    const jwtToken = JSON.parse(localStorage.getItem('jwtResponse'));
+    const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
 
     // If not authenticated, reroute to the login page
-    if (!jwtToken) {
+    if (!jwtResponse || !jwtResponse.accessToken) {
       navigate('/login');
-    } else {
-      // Send a GET request to check if the token is valid
-      const userId = JSON.parse(localStorage.getItem('jwtResponse')).id;
-      axios.get(`http://localhost:8080/api/user/details/${userId}`, getAxiosConfig())
-      .then((response) => {
-        // Token is valid, do nothing
-        console.log('Token is valid.');
-      })
-      .catch((error) => {
-        // Token is invalid or there was an error
-        console.error('Token validation error:', error);
-        // Redirect to the login page
-        navigate('/login');
-      });
+      return;
     }
   }, [navigate]);
 
