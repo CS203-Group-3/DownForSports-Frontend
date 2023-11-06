@@ -6,17 +6,18 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const HomePage = () => {
   const navigate = useNavigate();
 
+  
   useEffect(() => {
     // Check if the JWT token is present in localStorage
-    const jwtToken = localStorage.getItem('jwtResponse');
-    
-    // If not authenticated, redirect to the login page
-    if (jwtToken == null) {
+    const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
+
+    // If not authenticated, reroute to the login page
+    if (!jwtResponse || !jwtResponse.accessToken) {
       navigate('/login');
-    } else {
-      console.log(jwtToken);
+      return;
     }
   }, [navigate]);
+
 
   const backgroundStyle = {
     backgroundImage: `url('https://keeble-sample.s3.ap-southeast-1.amazonaws.com/%E2%80%94Pngtree%E2%80%94sports+basketball+backplane_780138.jpg')`,

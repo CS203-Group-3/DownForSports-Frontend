@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import OTPModal from "./OTPModal";
+import { Modal, Button, Form } from "react-bootstrap";
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -9,54 +9,34 @@ function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordTouched, setPasswordTouched] = useState(false);
-
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [otpVerified, setOtpVerified] = useState(false);
   const navigate = useNavigate();
+  const [userID, setUserID] = useState("");
+  const [otpVerificationError, setOtpVerificationError] = useState("");
 
-  // const isEmail = (email) => {
-  //   return String(email)
-  //     .toLowerCase()
-  //     .match(
-  //       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-  //     );
-  // };
 
   async function save(event) {
     event.preventDefault();
-
+  
     if (password !== confirmPassword) {
       alert("Passwords do not match");
       return;
     }
-
+  
     try {
       // Register the user
-      await axios.post("http://localhost:8080/api/auth/register", {
+      const response = await axios.post("http://localhost:8080/api/auth/register", {
         username: username,
         email: email,
-        password: password
+        password: password,
       });
-
-      // Log in the user immediately after registration
-      await axios
-        .post("http://localhost:8080/api/auth/login", {
-          username: username,
-          password: password
-        })
-        .then((response) => {
-          const jwtResponse = {
-            accessToken: "Bearer " + response.data.accessToken,
-            id: response.data.id,
-            username: response.data.username,
-            email: response.data.email,
-            roles: response.data.roles // Replace with the actual roles from your response
-          };
-          localStorage.setItem("jwtResponse", JSON.stringify(jwtResponse));
-          console.log("accessToken:", jwtResponse.accessToken);
-          console.log("Username:", jwtResponse.username);
-          console.log("Role:", jwtResponse.roles);
-          alert("Registration and Login Successful");
-          navigate("/home");
-        });
+  
+      setUserID(response.data.userID);
+      console.log(userID);
+      alert("Registration Successful");
+      setShowOtpModal(true);
     } catch (error) {
       if (error.response && error.response.status === 400) {
         const errorMessage = error.response.data.message;
@@ -66,7 +46,7 @@ function Register() {
       }
     }
   }
-
+  
   function validatePassword(password) {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     return passwordRegex.test(password);
@@ -78,12 +58,72 @@ function Register() {
     setPasswordTouched(true);
   }
 
+  function handleOtpChange(event) {
+    setOtp(event.target.value);
+  }
+  
+  async function verifyOtp() {
+    try {
+      const otpResponse = await axios.post("http://localhost:8080/api/otp/validateOtp", {
+        userId: userID,
+        oneTimePasswordCode: otp,
+      });
+  
+      if (otpResponse.status === 200) { // Check the HTTP status code
+        setOtpVerified(true);
+        setOtpVerificationError(""); // Reset OTP verification error
+        await autoLogin();
+      } else {
+        setOtpVerificationError("Wrong OTP, please try again");
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        const errorMessage = error.response.data;
+        setOtpVerificationError(errorMessage);
+      } else {
+        console.error("OTP Verification Error:", error.message);
+      }
+    }
+  }
+  
+  async function autoLogin() {
+    try {
+      const loginResponse = await axios.post("http://localhost:8080/api/auth/login", {
+        username: username,
+        password: password,
+      });
+  
+      const jwtResponse = {
+        accessToken: "Bearer " + loginResponse.data.accessToken,
+        id: loginResponse.data.id,
+        username: loginResponse.data.username,
+        email: loginResponse.data.email,
+        roles: loginResponse.data.roles,
+      };
+  
+      localStorage.setItem('jwtResponse', JSON.stringify(jwtResponse));
+      console.log('accessToken:', jwtResponse.accessToken);
+      console.log('Username:', jwtResponse.username);
+      console.log('Role:', jwtResponse.roles);
+      alert("Login Successful");
+      navigate("/home");
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        const errorMessage = error.response.data.message;
+        alert("Auto Login Failed: " + errorMessage);
+      } else {
+        console.error("Auto Login Error:", error.message);
+      }
+    }
+  }
+  
+  
+
   return (
     <div>
       <div class="container mt-4">
         <div class="card">
-          <h1>Registation</h1>
-
+          <h1>Registration</h1>
           <form>
             <div class="form-group">
               <label>NRIC</label>
@@ -98,7 +138,6 @@ function Register() {
                 }}
               />
             </div>
-
             <div class="form-group">
               <label>Email</label>
               <input
@@ -112,7 +151,6 @@ function Register() {
                 }}
               />
             </div>
-
             <div className="form-group">
               <label>Password</label>
               <input
@@ -125,12 +163,10 @@ function Register() {
               />
               {passwordTouched && !validatePassword(password) && (
                 <div className="text-danger">
-                  Password must contain at least 8 characters, a lowercase and
-                  uppercase letter, a number, and a special character (@$!%*?&)
+                  Password must contain at least 8 characters, a lowercase and uppercase letter, a number, and a special character (@$!%*?&)
                 </div>
               )}
             </div>
-
             <div class="form-group">
               <label>Confirm Password</label>
               <input
@@ -144,17 +180,42 @@ function Register() {
                 }}
               />
             </div>
-
-            {/* <button type="submit" class="btn btn-primary mt-4" onClick={save}>
+            <button type="submit" class="btn btn-primary mt-4" onClick={save}>
               Register
-            </button> */}
-            <OTPModal email={email} username={username} password={password} confirmPassword ={confirmPassword}/>
+            </button>
           </form>
-          <p className="mt-3">
-            Already created an account? <a href="/login">Log in here</a>
-          </p>
+          <p className="mt-3">Already created an account? <a href="/login">Log in here</a></p>
         </div>
       </div>
+      {/* <Modal show={showOtpModal} onHide={() => setShowOtpModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>OTP Verification</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group>
+            <Form.Label>Enter OTP</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter OTP"
+              value={otp}
+              onChange={handleOtpChange}
+            />
+          </Form.Group>
+          {otpVerificationError && (
+            <div className="text-danger">
+              {otpVerificationError}
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowOtpModal(false)}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={verifyOtp}>
+            Verify OTP
+          </Button>
+        </Modal.Footer>
+      </Modal> */}
     </div>
   );
 }

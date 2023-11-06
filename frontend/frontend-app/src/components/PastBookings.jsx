@@ -3,6 +3,8 @@ import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { Card, Button, Modal, Form } from 'react-bootstrap';
+import { getAxiosConfig } from './Headers';
+import { useNavigate } from 'react-router-dom';
 
 function PastBookings() {
   const [pastBookings, setPastBookings] = useState([]);
@@ -13,24 +15,43 @@ function PastBookings() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState('');
   const [bookingIdForCreditAppeal, setBookingIdForCreditAppeal] = useState(null);
-
-  const userId = JSON.parse(localStorage.getItem('jwtResponse')).id;
+  const navigate = useNavigate();
+  const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
 
   useEffect(() => {
+    if (!jwtResponse || !jwtResponse.accessToken) {
+      navigate('/login');
+      return;
+    } 
+
+    const userId = jwtResponse.id;
     axios
       .get("http://localhost:8080/api/bookings/viewpastbookings", {
         params: {
           userId: userId,
         },
+        headers: {
+          Authorization: JSON.parse(localStorage.getItem('jwtResponse')).accessToken,
+          withCredentials: true,
+        },
       })
       .then((response) => {
         console.log("View response: ", response.data);
-        setPastBookings(response.data);
+
+        // Sort the past bookings by date and time in descending order
+        const sortedBookings = response.data.sort((a, b) => {
+          // Parse dates and times and compare in reverse order
+          const dateTimeA = new Date(a.date + ' ' + a.startTime);
+          const dateTimeB = new Date(b.date + ' ' + b.startTime);
+          return dateTimeB - dateTimeA;
+        });
+
+        setPastBookings(sortedBookings);
       })
       .catch((error) => {
         console.error('Error fetching past bookings:', error);
       });
-  }, [userId]);
+  }, [navigate]);
 
   const openModal = (bookingId) => {
     setBookingIdForCreditAppeal(bookingId); // Set the bookingId for credit appeal
@@ -49,7 +70,7 @@ function PastBookings() {
     };
 
     axios
-      .post("http://localhost:8080/api/bookings/creditrequest", creditRequestData)
+      .post("http://localhost:8080/api/bookings/creditrequest", creditRequestData, getAxiosConfig() )
       .then((response) => {
         console.log("Credit request created:", response.data);
         setConfirmationMessage("Request sent successfully");
@@ -94,7 +115,8 @@ function PastBookings() {
                   <br />
                   <strong>Location:</strong> {booking.location}
                   <br />
-                  {booking.bookingAttended === false ? (
+
+                  {booking.bookingAttended === false && booking.bookingAttendanceChecked === true ? (
                     sentCreditRequests.includes(booking.bookingId) ? (
                       <span>Request sent</span>
                     ) : (

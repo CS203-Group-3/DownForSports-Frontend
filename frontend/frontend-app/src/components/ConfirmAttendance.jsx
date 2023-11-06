@@ -3,17 +3,25 @@ import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { Tabs, Tab, Card, Button, Modal } from 'react-bootstrap'; // Import Tabs and Tab from React-Bootstrap
+import { getAxiosConfig } from './Headers';
+import withRoleAuthorization from './RoleAuthorization';
+import { useNavigate } from 'react-router-dom';
 
 function ConfirmAttendance() {
   const [bookings, setBookings] = useState([]);
-
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [bookingId, setBookingId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
+    if (!jwtResponse || !jwtResponse.accessToken) {
+      navigate('/login');
+      return;
+    } 
     // Fetch all bookings from the API
-    axios.get('http://localhost:8080/api/bookings/')
+    axios.get('http://localhost:8080/api/bookings/', getAxiosConfig())
       .then((response) => {
         setBookings(response.data);
         setLoading(false);
@@ -22,7 +30,7 @@ function ConfirmAttendance() {
         console.error('Error fetching bookings:', error);
         setLoading(false);
       });
-  }, []);
+  }, [navigate]);
 
   const handleOpenModal = (id) => {
     setBookingId(id);
@@ -37,7 +45,7 @@ function ConfirmAttendance() {
     axios.post('http://localhost:8080/api/bookings/confirmbookingattendance', {
       bookingId: bookingId,
       attendanceStatus: attendanceStatus
-    })
+    }, getAxiosConfig())
     .then((response) => {
       console.log('Attendance confirmed successfully.');
       handleCloseModal();
@@ -56,6 +64,16 @@ function ConfirmAttendance() {
 
   // Filter upcoming bookings (exclude today's bookings)
   const upcomingBookings = bookings.filter((booking) => booking.date > today && !todayBookings.includes(booking));
+
+  if (loading) {
+    // Return a loading indicator while data is being fetched
+    return (
+      <div>
+        <MyNavbar />
+        <h1>Loading...</h1>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -140,4 +158,4 @@ function ConfirmAttendance() {
   );
 }
 
-export default ConfirmAttendance;
+export default withRoleAuthorization(['ROLE_BOOKINGMANAGER'])(ConfirmAttendance);

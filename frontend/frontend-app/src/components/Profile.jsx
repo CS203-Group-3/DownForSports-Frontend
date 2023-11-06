@@ -3,37 +3,23 @@ import MyNavbar from './NavbarComp';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { getAxiosConfig } from './Headers';
+import { useNavigate } from 'react-router-dom';
 
 function Profile() {
   const [profileData, setProfileData] = useState(null);
-
-  // useEffect(() => {
-  //   // Hardcoded profile data
-  //   const profile = {
-  //     username: 'Hirai Momo',
-  //     email: 'Momo@Twice.com',
-  //     creditScore: 269,
-  //     profilePictureUrl:
-  //       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvQOzLVWtuIaOlLcxtYyFdnQVDUHcGKTaCRQ&usqp=CAU',
-  //   };
-
-  //   setProfileData(profile);
-  // }, []);
+  const navigate = useNavigate();
 
     // Retrieve the jwtResponse from localStorage
     useEffect(() => {
       const jwtResponse = JSON.parse(localStorage.getItem('jwtResponse'));
-
-      // console.log(jwtResponse.accessToken)
-
+      if (!jwtResponse || !jwtResponse.accessToken) {
+        navigate('/login');
+        return;
+      } 
       const userId = jwtResponse.id;
-      axios.get(`http://localhost:8080/api/user/details/${userId}`,
-          { headers:
-                {
-                  Authorization : jwtResponse.accessToken,
-                  withCredentials:true
-                }
-          }) .then(res => {
+      axios.get(`http://localhost:8080/api/user/details/${userId}`, getAxiosConfig())
+            .then(res => {
             const profile = {
               username: res.data.username,
               email: res.data.email,
@@ -47,7 +33,7 @@ function Profile() {
             console.error('Error fetching profile data:', error);
           });
       
-      }, []);
+      }, [navigate]);
 
     // Check if jwtResponse is available
 
