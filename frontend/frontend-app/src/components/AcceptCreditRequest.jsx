@@ -24,7 +24,7 @@ function AcceptCreditRequest() {
       return;
     } 
     // Make an API call to fetch credit requests data when the component mounts
-    axios.get("http://localhost:8080/api/bookings/creditrequest", getAxiosConfig())
+    axios.get("http://18.141.196.51:8080/api/bookings/creditrequest", getAxiosConfig())
       .then((response) => {
         setCreditRequests(response.data);
       })
@@ -54,7 +54,7 @@ function AcceptCreditRequest() {
       console.log(creditID);
       console.log(userID);
       axios
-        .post("http://localhost:8080/api/bookings/creditrequest/confirm",
+        .post("http://18.141.196.51:8080/api/bookings/creditrequest/confirm",
         {
           userID: userID,
           amount: amount,
@@ -83,7 +83,7 @@ function AcceptCreditRequest() {
     } else if (action === 'Decline') {
       // Handle the Decline action
       axios
-        .post("http://localhost:8080/api/bookings/creditrequest/confirm", {
+        .post("http://18.141.196.51:8080/api/bookings/creditrequest/confirm", {
           userID: JSON.parse(localStorage.getItem('jwtResponse')).id,
           refundAmount: 0
         }, getAxiosConfig())

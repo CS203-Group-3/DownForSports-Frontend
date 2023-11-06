@@ -39,7 +39,7 @@ function FacilityList() {
     }
 
     axios
-      .get("http://localhost:8080/api/facilities", getAxiosConfig())
+      .get("http://18.141.196.51:8080/api/facilities", getAxiosConfig())
       .then((response) => {
         setFacilities(response.data);
       })
@@ -51,7 +51,7 @@ function FacilityList() {
 
   const fetchDates = (facility) => {
     axios
-      .get(`http://localhost:8080/api/facilities/${facility.facilityId}/dates`, getAxiosConfig())
+      .get(`http://18.141.196.51:8080/api/facilities/${facility.facilityId}/dates`, getAxiosConfig())
       .then((response) => {
         console.log("response: ", response.data);
         const datesArray = Object.entries(response.data).map(([facilityDateId, date]) => ({
@@ -69,7 +69,7 @@ function FacilityList() {
   const fetchTimeslots = (facilityDateId) => {
     axios
       .get(
-        `http://localhost:8080/api/facilities/${selectedFacility.facilityId}/dates/${facilityDateId}/timeslots`, getAxiosConfig()
+        `http://18.141.196.51:8080/api/facilities/${selectedFacility.facilityId}/dates/${facilityDateId}/timeslots`, getAxiosConfig()
       )
       .then((response) => {
         console.log("Response from the server:", response.data);
@@ -176,7 +176,7 @@ function FacilityList() {
       setLoading(true);
 
       try {
-        const response = await axios.post("http://localhost:8080/api/bookings/makebooking", bookingRequest, getAxiosConfig());
+        const response = await axios.post("http://18.141.196.51:8080/api/bookings/makebooking", bookingRequest, getAxiosConfig());
         console.log("Booking created:", response.data);
 
         setBookingSuccess(true);
@@ -212,12 +212,12 @@ function FacilityList() {
     if(facilityToDelete) {
       console.log("Cencelling facilily with facilityid: ", facilityToDelete.facilityId);
       axios
-      .delete(`http://localhost:8080/api/facilities/${facilityToDelete.facilityId}`, getAxiosConfig())
+      .delete(`http://18.141.196.51:8080/api/facilities/${facilityToDelete.facilityId}`, getAxiosConfig())
       .then((response) => {
         console.log("Facility deleted:", response.data);
         // Refresh the list of facilities after deletion
         axios
-          .get("http://localhost:8080/api/facilities", getAxiosConfig())
+          .get("http://18.141.196.51:8080/api/facilities", getAxiosConfig())
           .then((response) => {
             setFacilities(response.data);
           })
