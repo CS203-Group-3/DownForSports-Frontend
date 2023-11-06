@@ -4,7 +4,7 @@ import Modal from "react-bootstrap/Modal";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-function OTPModal() {
+function OTPModal(props) {
   const [show, setShow] = useState(false);
   const [otpValue, setOtpValue] = useState("");
   const [validationResult, setValidationResult] = useState(null);
@@ -53,16 +53,16 @@ function OTPModal() {
     try {
       // Register the user
       await axios.post("http://localhost:8080/api/auth/register", {
-        username: username,
-        email: email,
-        password: password
+        username: props.username,
+        email: props.email,
+        password: props.password
       });
 
       // Log in the user immediately after registration
       await axios
         .post("http://localhost:8080/api/auth/login", {
-          username: username,
-          password: password
+          username: props.username,
+          password: props.password
         })
         .then((response) => {
           const jwtResponse = {
