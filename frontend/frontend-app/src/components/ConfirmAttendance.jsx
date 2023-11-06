@@ -60,7 +60,7 @@ function ConfirmAttendance() {
   const today = new Date().toISOString().split('T')[0];
 
   // Filter today's bookings
-  const todayBookings = bookings.filter((booking) => booking.date === today);
+  const todayBookings = bookings.filter((booking) => booking.date === today && booking.date < today);
 
   // Filter upcoming bookings (exclude today's bookings)
   const upcomingBookings = bookings.filter((booking) => booking.date > today && !todayBookings.includes(booking));
@@ -130,9 +130,9 @@ function ConfirmAttendance() {
                         <strong>Location:</strong> {booking.location}
                       </Card.Text>
                     </Card.Body>
-                    <Card.Footer>
+                    {/* <Card.Footer>
                       <Button variant="primary" onClick={() => handleOpenModal(booking.bookingId)}>Confirm Attendance</Button>
-                    </Card.Footer>
+                    </Card.Footer> */}
                   </Card>
                 </div>
               ))}

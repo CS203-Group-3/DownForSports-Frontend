@@ -386,9 +386,7 @@ function FacilityList() {
             <p>Facility: {selectedFacility?.facilityType}</p>
             <p>Date: {selectedDate}</p>
             <p>Timeslot Start Time: {selectedTimeslots[0]?.time}</p>
-            {selectedEndTime && (
-              <p>Timeslot End Time: {selectedEndTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</p>
-            )}
+            <p>Timeslot End Time: {selectedEndTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}</p>
             <p>Total Credits Required: {totalCredits}</p>
           </Modal.Body>
           <Modal.Footer>
