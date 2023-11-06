@@ -30,17 +30,18 @@ function MyNavbar() {
   // Logout function to remove the JWT token from localStorage
   function logout() {
     // Retrieve the user's ID or userID from your front-end
-    const userId = JSON.parse(localStorage.getItem('jwtResponse')).id; // Replace with your logic to get the user's ID
-    axios.delete(`http://localhost:8080/api/user/logout/${userId}`, getAxiosConfig())
-      .then((response) => {
-        // Handle successful logout, e.g., clear user data in the front-end
-        localStorage.removeItem('jwtResponse');
-        navigate('/login'); // Redirect to the login page or any desired page
-      })
-      .catch((error) => {
-        // Handle any errors during the logout process
-        console.error("Error logging out:", error);
-      });
+    // const userId = JSON.parse(localStorage.getItem('jwtResponse')).id; // Replace with your logic to get the user's ID
+    // axios.delete(`http://localhost:8080/api/user/logout/${userId}`, getAxiosConfig())
+    //   .then((response) => {
+    //     // Handle successful logout, e.g., clear user data in the front-end
+         localStorage.removeItem('jwtResponse');
+         navigate("/login");
+    //     navigate('/login'); // Redirect to the login page or any desired page
+    //   })
+    //   .catch((error) => {
+    //     // Handle any errors during the logout process
+    //     console.error("Error logging out:", error);
+    //   });
   }
   
 

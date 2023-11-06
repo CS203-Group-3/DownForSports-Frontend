@@ -36,7 +36,8 @@ function Register() {
       setUserID(response.data.userID);
       console.log(userID);
       alert("Registration Successful");
-      setShowOtpModal(true);
+      //setShowOtpModal(true);
+      autoLogin();
     } catch (error) {
       if (error.response && error.response.status === 400) {
         const errorMessage = error.response.data.message;
